@@ -1,0 +1,43 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+.yarn/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.bak
+*.swo
+
+# Environment variables
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Next.js
+.next/
+out/
+
+# Logs
+*.log
+logs/
+
+# Migration scripts that might contain sensitive info or generated files
+load-env-migrate.js
+migrate.js
+
+# Project documentation and mapping
+ARCHITECTURE.md
+CODE_MAPPING.md
+PROJECT_PLAN.md
+
+# OS specific
+.DS_Store
+Thumbs.db

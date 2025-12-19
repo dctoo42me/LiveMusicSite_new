@@ -1,0 +1,23 @@
+# Dependency directories
+node_modules/
+
+# Next.js build output
+.next/
+
+# Next.js environment variables (local)
+.env.local
+
+# Generic .env files (if used in frontend directly)
+.env
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
