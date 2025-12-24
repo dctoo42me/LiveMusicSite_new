@@ -35,9 +35,16 @@ export async function GET(request: Request) {
         return Response.json(data, { status: 200 });
 
     } catch (error) {
-        console.error('Next.js API Proxy Error:', error.message);
+        let errorMessage = 'An unknown error occurred.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+
+        console.error('Next.js API Proxy Error:', errorMessage);
         return Response.json(
-            { error: 'Failed to fetch search results from backend.', details: error.message },
+            { error: 'Failed to fetch search results from backend.', details: errorMessage },
             { status: 500 }
         );
     }
