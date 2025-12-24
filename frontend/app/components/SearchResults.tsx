@@ -1,10 +1,10 @@
 'use client';
 
-import type { Venue } from '../../types/venue'; // We'll create this type definition file
-import { useAuth } from '../../contexts/AuthContext';
-import { addFavorite, removeFavorite } from '../../services/api';
+import type { Venue } from '@/types/venue';
+import { useAuth } from '@/contexts/AuthContext';
+import { addFavorite, removeFavorite } from '@/services/api';
 import { useState } from 'react';
-import { useToast } from '../../contexts/ToastContext'; // Import useToast
+import { useToast } from '@/contexts/ToastContext';
 
 interface SearchResultsProps {
   venues: Venue[];

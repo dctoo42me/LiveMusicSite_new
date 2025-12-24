@@ -1,5 +1,6 @@
 // server/src/auth.ts
-import { Request, Response, NextFunction } from 'express';
+import pkg from 'express';
+const { Request, Response, NextFunction } = pkg;
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByUsername } from './authRepository.ts';

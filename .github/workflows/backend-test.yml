@@ -1,0 +1,30 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use Node.js 20, consistent with modern Next.js/Node projects
+
+      - name: Install dependencies (server)
+        run: npm install
+        working-directory: ./server
+
+      - name: Run backend tests
+        run: npm test
+        working-directory: ./server

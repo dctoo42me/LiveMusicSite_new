@@ -7,6 +7,7 @@
     "start": "node --loader ts-node/esm src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
     "test": "vitest",
+    "build": "tsc",
     "migrate": "npx node-pg-migrate"
   },
   "keywords": [],
@@ -22,6 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.3",
     "node-pg-migrate": "^8.0.4",
     "pg": "^8.16.3",

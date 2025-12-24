@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import logger from './logger'; // Assuming logger is available
+import logger from './logger.ts'; // Assuming logger is available
 
 const redisClient = new Redis({
   port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,

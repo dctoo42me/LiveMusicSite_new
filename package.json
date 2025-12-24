@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "migrate": "node load-env-migrate.js", 
+    "migrate": "node load-env-migrate.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,7 +12,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@google/genai": "^1.32.0"
+    "@google/genai": "^1.32.0",
+    "nodemon": "^3.1.11"
   },
   "dependencies": {
     "cross-env": "^10.1.0",

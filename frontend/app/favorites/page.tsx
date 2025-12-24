@@ -2,11 +2,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getFavorites, removeFavorite } from '../../services/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { getFavorites, removeFavorite } from '@/services/api';
 import { useRouter } from 'next/navigation';
-import type { Venue } from '../../types/venue';
-import { useToast } from '../../contexts/ToastContext'; // Import useToast
+import type { Venue } from '@/types/venue';
+import { useToast } from '@/contexts/ToastContext';
 
 const ITEMS_PER_PAGE = 9; // Define items per page for favorites
 
