@@ -20,6 +20,11 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@/app/*": ["app/*"],
+      "@/components/*": ["app/components/*"],
+      "@/contexts/*": ["app/contexts/*"],
+      "@/services/*": ["app/services/*"],
+      "@/types/*": ["types/*"],
       "@/*": ["./*"]
     }
   },
