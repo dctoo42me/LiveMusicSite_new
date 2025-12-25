@@ -1,9 +1,9 @@
 // server/src/db.ts
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { fileURLToPath } from 'url';
-import logger from './utils/logger.ts'; // Import logger
+import logger from './utils/logger.js'; // Import logger
 
 // Replicate __dirname functionality in ES Modules
 const __filename = fileURLToPath(import.meta.url);

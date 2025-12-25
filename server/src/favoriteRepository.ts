@@ -1,7 +1,7 @@
 // server/src/favoriteRepository.ts
 import { Pool } from 'pg'; // Import Pool type for declaration
-import logger from './utils/logger.ts'; // Import logger
-import redisClient from './utils/redis.ts'; // Import redis client
+import logger from './utils/logger.js'; // Import logger
+import redisClient from './utils/redis.js'; // Import redis client
 
 const CACHE_TTL_SECONDS_FAVORITES = 60; // Shorter TTL for user-specific favorites
 

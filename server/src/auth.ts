@@ -1,10 +1,9 @@
 // server/src/auth.ts
-import pkg from 'express';
-const { Request, Response, NextFunction } = pkg;
+import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { createUser, findUserByUsername } from './authRepository.ts';
-import logger from './utils/logger.ts'; // Import logger
+import { createUser, findUserByUsername } from './authRepository.js';
+import logger from './utils/logger.js'; // Import logger
 import { Pool } from 'pg'; // Import Pool type for register/login
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_secret';

@@ -5,11 +5,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 // Import the new connection pool and the repository function
-import { createPool } from './db.ts'; 
-import { searchVenues } from './venueRepository.ts';
-import { register, login, verifyToken } from './auth.ts';
-import { addFavorite, removeFavorite, getFavorites } from './favoriteRepository.ts';
-import logger from './utils/logger.ts'; // Import logger
+import { createPool } from './db.js'; 
+import { searchVenues } from './venueRepository.js';
+import { register, login, verifyToken } from './auth.js';
+import { addFavorite, removeFavorite, getFavorites } from './favoriteRepository.js';
+import logger from './utils/logger.js'; // Import logger
 
 // Load environment variables from .env file
 if (process.env.NODE_ENV !== 'test') {
@@ -148,7 +148,10 @@ app.get('/api/favorites', verifyToken, async (req: Request, res: Response) => {
   const userId = (req as any).user.userId;
 
   try {
-    const favorites = await getFavorites(pool, userId);
+    // Define default limit and offset for this API call if not provided by query params
+    const defaultLimit = 10;
+    const defaultOffset = 0;
+    const favorites = await getFavorites(pool, userId, defaultLimit, defaultOffset);
     res.json(favorites);
   } catch (error) {
     logger.error('Get favorites error:', error); // Use logger

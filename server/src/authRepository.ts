@@ -1,6 +1,6 @@
 // server/src/authRepository.ts
 import { Pool } from 'pg'; // Import Pool type for declaration
-import logger from './utils/logger.ts'; // Import logger
+import logger from './utils/logger.js'; // Import logger
 // server/src/authRepository.ts
 
 
