@@ -1,7 +1,6 @@
 // server/src/index.ts
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 
 // Import the new connection pool and the repository function
@@ -10,11 +9,6 @@ import { searchVenues } from './venueRepository.js';
 import { register, login, verifyToken } from './auth.js';
 import { addFavorite, removeFavorite, getFavorites } from './favoriteRepository.js';
 import logger from './utils/logger.js'; // Import logger
-
-// Load environment variables from .env file
-if (process.env.NODE_ENV !== 'test') {
-  dotenv.config(); 
-}
 
 export function createApp() {
   const app = express();
