@@ -9,10 +9,48 @@ import { searchVenues } from './venueRepository.js';
 import { register, login, verifyToken } from './auth.js';
 import { addFavorite, removeFavorite, getFavorites } from './favoriteRepository.js';
 import logger from './utils/logger.js'; // Import logger
+import { spawnSync } from 'child_process'; // Import to run external commands
+import path from 'path'; // Import path to resolve migration script
+import { fileURLToPath } from 'url'; // For __dirname in ES Modules
+
+// Replicate __dirname functionality in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Function to run database migrations
+async function runMigrations() {
+  logger.info('Running database migrations...');
+  try {
+    const result = spawnSync('npm', ['run', 'migrate', 'up'], { 
+      cwd: path.resolve(__dirname, '..'), // Run from the server directory (parent of dist)
+      stdio: 'inherit', 
+      shell: true 
+    });
+
+    if (result.error) {
+      logger.error('Migration failed:', result.error);
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      logger.error(`Migration exited with code ${result.status}`);
+      throw new Error(`Migration exited with code ${result.status}`);
+    }
+    logger.info('Database migrations completed successfully.');
+  } catch (error) {
+    logger.error('Error during migration startup:', error);
+    process.exit(1); // Exit if migrations fail
+  }
+}
 
 export function createApp() {
   const app = express();
   const pool = createPool(); // Initialize pool here
+
+  // Run migrations before the server starts accepting requests
+  // Only run if not in test environment to avoid interference with tests
+  if (process.env.NODE_ENV !== 'test') {
+    runMigrations(); 
+  }
 
 // --- CORS CONFIGURATION ---
 const corsOptions = {
