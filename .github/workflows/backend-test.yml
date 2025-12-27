@@ -23,7 +23,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -d test_database -U test_user" # Specific health check
+          --health-cmd "pg_isready -d test_database -U test_user"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -54,7 +54,7 @@ jobs:
         run: npm run build
         working-directory: ./server
 
-      # NEW: Run migrations for the test database
+      # Run migrations for the test database
       - name: Run test database migrations
         run: npm run migrate up
         working-directory: ./server
