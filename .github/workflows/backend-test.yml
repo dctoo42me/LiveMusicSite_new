@@ -23,15 +23,14 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -d test_database -U test_user" # Specific health check
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      # NEW: Service container for Redis
       redis:
-        image: redis:6-alpine # Use a lightweight Redis image
+        image: redis:6-alpine
         ports:
-          - 6379:6379 # Map port 6379 from container to host
+          - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
@@ -55,10 +54,17 @@ jobs:
         run: npm run build
         working-directory: ./server
 
+      # NEW: Run migrations for the test database
+      - name: Run test database migrations
+        run: npm run migrate up
+        working-directory: ./server
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_database
+
       - name: Run backend tests
         run: npm test
         working-directory: ./server
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_database
-          REDIS_URL: redis://localhost:6379 # Point to the Redis service
+          REDIS_URL: redis://localhost:6379
           JWT_SECRET: supersecretkey
