@@ -1,16 +1,17 @@
 name: Deploy Backend to Render
 
 on:
-  push:
-    branches:
-      - main # Trigger on pushes to the main branch
+  workflow_run:
+    workflows: ["Backend CI"] # Name of the workflow that needs to complete
+    types:
+      - completed # Trigger when the workflow run is completed
 
 jobs:
   deploy:
     name: Deploy to Render
     runs-on: ubuntu-latest
-    needs: test # Ensure tests pass before deploying
-    environment: production # Mark this job as targeting production
+    if: "${{ github.event.workflow_run.conclusion == 'success' }}" # Only run if the triggering workflow succeeded
+    environment: production
 
     steps:
       - name: Checkout code
@@ -32,4 +33,4 @@ jobs:
                -d '{}' \
                https://api.render.com/v1/services/${SERVICE_ID}/deploys
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }} # Pass the secret to the step
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
