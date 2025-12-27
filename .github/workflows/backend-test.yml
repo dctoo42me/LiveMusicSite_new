@@ -12,6 +12,23 @@ jobs:
   test:
     name: Test Backend
     runs-on: ubuntu-latest
+
+    services:
+      # Service container for PostgreSQL
+      postgres:
+        image: postgres:15-alpine # Use a lightweight PostgreSQL image
+        env:
+          POSTGRES_DB: test_database # Name of the test database
+          POSTGRES_USER: test_user   # Test database user
+          POSTGRES_PASSWORD: test_password # Test database password
+        ports:
+          - 5432:5432 # Map port 5432 from container to host
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,12 +36,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use Node.js 20, consistent with modern Next.js/Node projects
+          node-version: '20'
 
       - name: Install dependencies (server)
         run: npm install
         working-directory: ./server
 
+      - name: Build backend
+        run: npm run build
+        working-directory: ./server
+
       - name: Run backend tests
         run: npm test
         working-directory: ./server
+        env: # Environment variables for the test run
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_database
+          REDIS_URL: redis://localhost:6379 # Add Redis URL, tests might need it
+          JWT_SECRET: supersecretkey # Add JWT secret, tests might need it
