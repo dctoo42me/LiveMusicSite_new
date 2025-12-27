@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm src/index.ts",
+    "start": "npm run migrate up && node dist/index.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'sh -c \"npm run start:dev\"'",
     "start:dev": "npm run build && node -r dotenv/config dist/index.js",
     "test": "vitest",
