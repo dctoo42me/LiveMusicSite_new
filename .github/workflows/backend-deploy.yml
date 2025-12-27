@@ -1,0 +1,35 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+
+jobs:
+  deploy:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: test # Ensure tests pass before deploying
+    environment: production # Mark this job as targeting production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Render Deployment
+        run: |
+          SERVICE_ID=$(curl -H "Accept: application/json" -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+                      https://api.render.com/v1/services \
+                      | jq -r '.[] | select(.name == "LiveMusicSite-backend") | .id')
+          
+          if [ -z "$SERVICE_ID" ]; then
+            echo "Error: Render service 'LiveMusicSite-backend' not found."
+            exit 1
+          fi
+
+          curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+               -H "Content-Type: application/json" \
+               -d '{}' \
+               https://api.render.com/v1/services/${SERVICE_ID}/deploys
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }} # Pass the secret to the step
