@@ -14,17 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Service container for PostgreSQL
       postgres:
-        image: postgres:15-alpine # Use a lightweight PostgreSQL image
+        image: postgres:15-alpine
         env:
-          POSTGRES_DB: test_database # Name of the test database
-          POSTGRES_USER: test_user   # Test database user
-          POSTGRES_PASSWORD: test_password # Test database password
+          POSTGRES_DB: test_database
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
         ports:
-          - 5432:5432 # Map port 5432 from container to host
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      # NEW: Service container for Redis
+      redis:
+        image: redis:6-alpine # Use a lightweight Redis image
+        ports:
+          - 6379:6379 # Map port 6379 from container to host
+        options: >-
+          --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -49,7 +58,7 @@ jobs:
       - name: Run backend tests
         run: npm test
         working-directory: ./server
-        env: # Environment variables for the test run
+        env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_database
-          REDIS_URL: redis://localhost:6379 # Add Redis URL, tests might need it
-          JWT_SECRET: supersecretkey # Add JWT secret, tests might need it
+          REDIS_URL: redis://localhost:6379 # Point to the Redis service
+          JWT_SECRET: supersecretkey
