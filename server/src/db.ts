@@ -13,11 +13,7 @@ export function createPool() {
   // No explicit dotenv.config() call needed in production.
 
   const pool = new Pool({
-    host: process.env.PGHOST,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE,
-    port: 5432, // Default PostgreSQL port
+    connectionString: process.env.DATABASE_URL,
   });
 
   pool.on('connect', () => {
@@ -31,4 +27,4 @@ export function createPool() {
   return pool;
 }
 
-export default createPool();
+

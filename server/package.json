@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "node --loader ts-node/esm src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'sh -c \"npm run start:dev\"'",
+    "start:dev": "npm run build && node -r dotenv/config dist/index.js",
     "test": "vitest",
     "build": "tsc",
     "migrate": "npx node-pg-migrate"
@@ -15,14 +16,15 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/gemini-cli": "github:google-gemini/gemini-cli",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/winston": "^2.4.4",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.1",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^6.0.3",
+    "@types/winston": "^2.4.4",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

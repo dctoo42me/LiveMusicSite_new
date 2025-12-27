@@ -1,7 +1,7 @@
 // server/src/venueRepository.ts
 
-import pool from './db.js'; // Import the centralized pool
-import type { PoolClient } from 'pg';
+
+import type { Pool, PoolClient } from 'pg';
 import redisClient from './utils/redis.js'; // Import redis client
 import logger from './utils/logger.js'; // Import logger
 
@@ -32,14 +32,13 @@ const sanitize = (text: string) => text.replace(/[^a-zA-Z0-9\s]/g, '');
 const CACHE_TTL_SECONDS = 300; // 5 minutes
 
 export async function searchVenues(
-    // The connected PostgreSQL client is no longer passed as an argument
-    location: string, 
-    date: string, 
+    pool: Pool, // Add pool argument
+    location: string,
+    date: string,
     type: string,
-    limit: number, 
-    offset: number 
-): Promise<SearchResult> {
-    
+    limit: number,
+    offset: number
+): Promise<SearchResult> {    
     let client: PoolClient | null = null; // Initialize client to null
 
     // Generate a unique cache key for this search query

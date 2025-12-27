@@ -4,7 +4,7 @@ import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 
 // Import the new connection pool and the repository function
-import { createPool } from './db.js'; 
+import { createPool } from './db.js';
 import { searchVenues } from './venueRepository.js';
 import { register, login, verifyToken } from './auth.js';
 import { addFavorite, removeFavorite, getFavorites } from './favoriteRepository.js';
@@ -46,12 +46,11 @@ export function createApp() {
   const app = express();
   const pool = createPool(); // Initialize pool here
 
-  // Run migrations before the server starts accepting requests
-  // Only run if not in test environment to avoid interference with tests
-  if (process.env.NODE_ENV !== 'test') {
-    runMigrations(); 
-  }
-
+    // Run migrations before the server starts accepting requests
+    // Only run if not in test environment to avoid interference with tests
+    if (process.env.NODE_ENV !== 'test') {
+      runMigrations();
+    }
 // --- CORS CONFIGURATION ---
 const corsOptions = {
   origin: 'http://localhost:3000', // Allow requests from frontend dev server
@@ -107,14 +106,14 @@ app.get('/api/venues/search', async (req: Request, res: Response) => {
 
     try {
         // Call the repository function (no longer passing the client)
-        const { totalCount, venues } = await searchVenues(
-            (location as string) || '',
-            (date as string) || '',
-            searchType,
-            safeLimit,   
-            safeOffset   
-        );
-
+                const { totalCount, venues } = await searchVenues(
+                    pool,
+                    (location as string) || '',
+                    (date as string) || '',
+                    searchType,
+                    safeLimit,
+                    safeOffset
+                );
         res.json({
           count: venues.length,
           totalCount: totalCount, 

@@ -1,6 +1,5 @@
 // server/src/db.ts
 import { Pool } from 'pg';
-import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import logger from './utils/logger.js'; // Import logger
@@ -8,14 +7,10 @@ import logger from './utils/logger.js'; // Import logger
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export function createPool() {
-    // Load environment variables from server/.env, resolving from the current module's directory
-    dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+    // Environment variables are now expected to be provided by the hosting environment (e.g., Render)
+    // No explicit dotenv.config() call needed in production.
     const pool = new Pool({
-        host: process.env.PGHOST,
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
-        port: 5432, // Default PostgreSQL port
+        connectionString: process.env.DATABASE_URL,
     });
     pool.on('connect', () => {
         logger.info('Database client connected'); // Use logger
@@ -26,5 +21,4 @@ export function createPool() {
     });
     return pool;
 }
-export default createPool();
 //# sourceMappingURL=db.js.map

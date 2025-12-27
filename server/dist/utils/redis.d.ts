@@ -1,4 +1,4 @@
 import { Redis } from 'ioredis';
-declare const redisClient: Redis;
+declare let redisClient: Redis;
 export default redisClient;
 //# sourceMappingURL=redis.d.ts.map
