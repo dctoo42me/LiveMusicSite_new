@@ -96,7 +96,7 @@ describe('API Endpoints', () => {
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Test Venue');
       expect(res.body.venues[0].website).toEqual('http://testvenue.com');
-      expect(searchVenues).toHaveBeenCalledWith('Austin', '', 'both', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Austin', '', 'both', 10, 0);
     });
 
     it('should filter by type "music" correctly', async () => {
@@ -121,7 +121,7 @@ describe('API Endpoints', () => {
       const res = await request(app).get('/api/venues/search?location=Dallas&type=music');
       expect(res.statusCode).toEqual(200);
       expect(res.body.venues[0].type).toEqual('music');
-      expect(searchVenues).toHaveBeenCalledWith('Dallas', '', 'music', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', 'music', 10, 0);
     });
 
     it('should handle empty search results gracefully', async () => {
@@ -149,7 +149,7 @@ describe('API Endpoints', () => {
       const res = await request(app).get('/api/venues/search?location=Houston&limit=5&offset=10');
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(5);
-      expect(searchVenues).toHaveBeenCalledWith('Houston', '', 'both', 5, 10);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', 'both', 5, 10);
     });
 
     it('should return 500 if searchVenues throws an error', async () => {
@@ -170,7 +170,7 @@ describe('API Endpoints', () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Date Specific Venue');
-      expect(searchVenues).toHaveBeenCalledWith('', '2026-02-15', 'both', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), '', '2026-02-15', 'both', 10, 0);
     });
 
     it('should call searchVenues with location and type when date is not provided', async () => {
@@ -183,7 +183,7 @@ describe('API Endpoints', () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Location Type Venue');
-      expect(searchVenues).toHaveBeenCalledWith('Dallas', '', 'jazz', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', 'jazz', 10, 0);
     });
 
     it('should handle negative limit by using a minimum limit of 1', async () => {
@@ -194,7 +194,7 @@ describe('API Endpoints', () => {
 
       const res = await request(app).get('/api/venues/search?location=Houston&limit=-5');
       expect(res.statusCode).toEqual(200);
-      expect(searchVenues).toHaveBeenCalledWith('Houston', '', 'both', 1, 0); // Expect limit to be 1
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', 'both', 1, 0); // Expect limit to be 1
     });
 
     it('should handle negative offset by using a minimum offset of 0', async () => {
@@ -205,7 +205,7 @@ describe('API Endpoints', () => {
 
       const res = await request(app).get('/api/venues/search?location=Miami&offset=-10');
       expect(res.statusCode).toEqual(200);
-      expect(searchVenues).toHaveBeenCalledWith('Miami', '', 'both', 10, 0); // Expect offset to be 0
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Miami', '', 'both', 10, 0); // Expect offset to be 0
     });
   });
 });
