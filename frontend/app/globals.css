@@ -9,34 +9,3 @@
     height: auto;
   }
 }
-
-/* Custom Overrides for Header and Layout */
-.main-header {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999 !important; /* Extremely high z-index to ensure it's on top */
-  background-color: #1F2937 !important; /* Ensure background is applied */
-}
-
-/* Ensure NavLink spans are visible */
-.main-header nav a span {
-  color: white !important; /* Force white text */
-  /* Remove hover here, let Tailwind handle it in the component */
-}
-
-/* Ensure the hamburger button is visible and has a specific color */
-.main-header button.md\:hidden {
-  color: #FF473A !important; /* Force primary color for visibility */
-}
-
-/* Ensure mobile menu container is above everything */
-.main-header > div:last-child { /* Targets the mobile menu div directly */
-  z-index: 9999 !important;
-  background-color: #1F2937 !important; /* Ensure background is applied */
-}
-
-.page-content {
-  padding-top: 80px !important; /* Adjust this value to match your header's height */
-}

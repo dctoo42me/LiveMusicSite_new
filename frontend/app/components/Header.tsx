@@ -9,7 +9,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-gray-800 shadow-lg z-50"> {/* Simplified header classes */}
+    <header className="sticky top-0 z-50 bg-gray-800 shadow-lg"> {/* Standard dark background */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
           <div className="text-2xl font-extrabold text-white hover:text-blue-400 transition duration-300 cursor-pointer"> {/* Standard white text */}
@@ -41,12 +41,12 @@ export default function Header() {
           ) : (
             <div className="space-x-4">
               <Link href="/login" passHref>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
+                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300"> {/* Changed to bg-blue-500 */}
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref>
-                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
+                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300"> {/* Changed to bg-green-500 */}
                   Register
                 </button>
               </Link>
@@ -99,12 +99,12 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center"> {/* Changed to bg-blue-500 */}
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center"> {/* Changed to bg-green-500 */}
                   Register
                 </button>
               </Link>
