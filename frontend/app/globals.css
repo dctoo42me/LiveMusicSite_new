@@ -30,3 +30,8 @@
 .page-content {
   padding-top: 80px; /* Adjust this value to match your header's height */
 }
+
+/* DIAGNOSTIC: Undeniable RED BORDER */
+body {
+  border: 5px solid red !important;
+}
