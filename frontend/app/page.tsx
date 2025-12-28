@@ -80,7 +80,7 @@ export default function HomePage() {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 bg-gray-50">
+    <div className="relative z-0 flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 bg-gray-50">
       
       <div className="text-center max-w-4xl mb-12">
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">

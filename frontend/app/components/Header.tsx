@@ -124,7 +124,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-gray-300 hover:text-white font-medium transition duration-300">
+    <span className="text-gray-200 hover:text-white font-medium transition duration-300">
       {text}
     </span>
   </Link>
