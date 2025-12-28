@@ -12,7 +12,7 @@ export default function Header() {
     <header className="main-header sticky top-0 bg-dark-background shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
-          <div className="text-2xl font-extrabold text-primary hover:text-secondary transition duration-300 cursor-pointer">
+          <div className="text-2xl font-extrabold text-highlight hover:text-secondary transition duration-300 cursor-pointer">
             Tune & Dine
           </div>
         </Link>
@@ -55,7 +55,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden text-primary text-2xl"
+          className="md:hidden text-highlight text-2xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
@@ -124,7 +124,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-white hover:text-primary font-medium transition duration-300">
+    <span className="text-white hover:text-highlight font-medium transition duration-300">
       {text}
     </span>
   </Link>

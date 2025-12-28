@@ -13,9 +13,10 @@ const config: Config = {
     extend: {
       colors: {
         // --- OUR CUSTOM COLOR DEFINITIONS ---
-        'primary': '#FF473A', // High-energy red/orange for main buttons
-        'primary-darker': '#E03D33',
-        'secondary': '#3A7DFF', // Cool blue for accents
+        'primary': '#3A86FF', // Vibrant blue for primary actions
+        'primary-darker': '#2A6AFF', // Slightly darker primary
+        'secondary': '#FF006E', // Bright pink/magenta for accents
+        'highlight': '#F7F7F7', // Very light color for elements needing high contrast on dark backgrounds
         'dark-background': '#1F2937', // Dark gray for the Header
         'background': '#F9FAFB', // Light off-white for the body
         'text-dark': '#111827', // Near-black for main text
