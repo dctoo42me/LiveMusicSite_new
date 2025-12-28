@@ -30,11 +30,6 @@ const config: Config = {
       },
     },
   },
-  safelist: [ // This effectively disables purging by making all common classes safe
-    {
-      pattern: /.*/,
-    },
-  ],
   plugins: [],
 }
 export default config
