@@ -9,7 +9,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-background shadow-lg">
+    <header className="sticky top-0 z-[100] bg-dark-background shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
           <div className="text-2xl font-extrabold text-primary hover:text-secondary transition duration-300 cursor-pointer">
@@ -124,7 +124,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-white hover:text-secondary font-medium transition duration-300">
+    <span className="text-gray-300 hover:text-white font-medium transition duration-300">
       {text}
     </span>
   </Link>
