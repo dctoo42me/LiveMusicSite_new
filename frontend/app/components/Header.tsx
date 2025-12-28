@@ -9,7 +9,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-dark-background shadow-lg">
+    <header className="main-header sticky top-0 bg-dark-background shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
           <div className="text-2xl font-extrabold text-primary hover:text-secondary transition duration-300 cursor-pointer">

@@ -9,3 +9,24 @@
     height: auto;
   }
 }
+
+/* Custom Overrides for Header and Layout */
+.main-header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100 !important;
+}
+
+.main-header nav a span {
+  color: white !important;
+}
+
+.main-header button.md\:hidden {
+  color: white !important;
+}
+
+.page-content {
+  padding-top: 80px; /* Adjust this value to match your header's height */
+}
