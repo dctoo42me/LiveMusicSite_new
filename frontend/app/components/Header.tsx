@@ -9,10 +9,10 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="main-header sticky top-0 bg-dark-background shadow-lg">
+    <header className="fixed top-0 left-0 right-0 bg-gray-800 shadow-lg z-50"> {/* Simplified header classes */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
-          <div className="text-2xl font-extrabold text-highlight hover:text-secondary transition duration-300 cursor-pointer">
+          <div className="text-2xl font-extrabold text-white hover:text-blue-400 transition duration-300 cursor-pointer"> {/* Standard white text */}
             Tune & Dine
           </div>
         </Link>
@@ -41,12 +41,12 @@ export default function Header() {
           ) : (
             <div className="space-x-4">
               <Link href="/login" passHref>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
+                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
+                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">
                   Register
                 </button>
               </Link>
@@ -55,7 +55,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden text-highlight text-2xl"
+          className="md:hidden text-white text-2xl" /* Standard white text */
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
@@ -64,7 +64,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-dark-background z-[110] transform ${
+        className={`fixed top-0 left-0 w-full h-full bg-gray-800 z-50 transform ${ /* Standard dark background and z-50 */
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
@@ -99,12 +99,12 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
                   Register
                 </button>
               </Link>
@@ -124,7 +124,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-white hover:text-highlight font-medium transition duration-300">
+    <span className="text-white hover:text-blue-400 font-medium transition duration-300"> {/* Standard white text and blue hover */}
       {text}
     </span>
   </Link>
