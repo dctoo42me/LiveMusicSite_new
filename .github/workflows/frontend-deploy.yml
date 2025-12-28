@@ -1,0 +1,47 @@
+name: Deploy Frontend to Vercel
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main # Also trigger on pull requests for preview deployments
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install Vercel CLI (global install is common in CI)
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # Pull Vercel environment variables (if any are linked to your project)
+      - name: Pull Vercel Environment Variables
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./frontend
+
+      # Build the Next.js project
+      - name: Build Project Locally (Optional, Vercel often does this)
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./frontend
+
+      # Deploy to Vercel
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Ensure NEXT_PUBLIC_BACKEND_URL is set for the build
+          NEXT_PUBLIC_BACKEND_URL: https://livemusicsite-backend.onrender.com # Use your deployed backend URL here
