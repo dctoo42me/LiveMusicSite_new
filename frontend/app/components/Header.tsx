@@ -99,12 +99,12 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center"> {/* Changed to bg-blue-500 */}
+                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center"> {/* Changed to bg-green-500 */}
+                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
                   Register
                 </button>
               </Link>
@@ -124,7 +124,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-white hover:text-blue-400 font-medium transition duration-300"> {/* Standard white text and blue hover */}
+    <span className="text-white hover:text-blue-400 font-medium transition duration-300">
       {text}
     </span>
   </Link>
