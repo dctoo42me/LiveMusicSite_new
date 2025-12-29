@@ -1,56 +1,48 @@
-// frontend/app/components/ErrorBoundary.tsx
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
-interface ErrorBoundaryProps {
+interface Props {
   children: ReactNode;
 }
 
-interface ErrorBoundaryState {
+interface State {
   hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState = {
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
     hasError: false,
-    error: null,
-    errorInfo: null,
   };
 
-  public static getDerivedStateFromError(_: Error): ErrorBoundaryState {
+  public static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true, error: _, errorInfo: null };
+    return { hasError: true };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
-    // You can also log the error to an error reporting service here
-    this.setState({
-      error: error,
-      errorInfo: errorInfo,
-    });
+    console.error('Uncaught error:', error, errorInfo);
   }
 
   public render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 text-red-800">
-          <h1 className="text-4xl font-bold mb-4">Oops! Something went wrong.</h1>
-          <p className="text-lg mb-4">We're sorry, an unexpected error occurred.</p>
-          {process.env.NODE_ENV === 'development' && this.state.error && this.state.errorInfo && (
-            <details className="mt-4 p-4 bg-red-100 rounded-lg max-w-lg overflow-auto">
-              <summary className="font-semibold cursor-pointer">Error Details</summary>
-              <pre className="mt-2 text-sm text-red-700 whitespace-pre-wrap">
-                {this.state.error.toString()}
-                <br />
-                {this.state.errorInfo.componentStack}
-              </pre>
-            </details>
-          )}
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
+          <div className="text-center p-8 bg-white rounded-2xl shadow-2xl max-w-lg">
+            <h1 className="text-4xl font-extrabold text-red-600 mb-4">Something went wrong.</h1>
+            <p className="text-lg mb-6">
+              We're sorry for the inconvenience. An unexpected error occurred.
+            </p>
+            <p className="text-sm text-gray-500 mb-8">
+              Our team has been notified. Please try refreshing the page or come back later.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-lg"
+            >
+              Refresh Page
+            </button>
+          </div>
         </div>
       );
     }
