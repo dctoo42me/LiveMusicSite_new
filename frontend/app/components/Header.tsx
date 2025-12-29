@@ -41,12 +41,12 @@ export default function Header() {
           ) : (
             <div className="space-x-4">
               <Link href="/login" passHref>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300"> {/* Use secondary */}
+                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"> {/* Use secondary */}
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300"> {/* Use primary */}
+                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"> {/* Use primary */}
                   Register
                 </button>
               </Link>
@@ -55,7 +55,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden text-highlight text-2xl" /* Use highlight */
+          className="md:hidden text-highlight text-2xl hover:text-primary transition-colors duration-300" /* Use highlight and hover */
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
