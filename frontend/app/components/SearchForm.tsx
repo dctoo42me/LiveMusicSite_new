@@ -61,7 +61,7 @@ export default function SearchForm({
                     type="button"
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                     className="
-                        flex items-center space-x-2 text-blue-600 hover:text-blue-800 
+                        flex items-center space-x-2 text-primary hover:text-primary-darker
                         font-semibold text-sm transition-colors duration-200
                     "
                 >
@@ -91,7 +91,7 @@ export default function SearchForm({
                             type="date"
                             value={date}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
-                            className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
+                            className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-primary focus:ring-4 focus:ring-primary/20"
                         />
                     </div>
 
@@ -105,7 +105,7 @@ export default function SearchForm({
                                 id="type"
                                 value={type}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setType(e.target.value)}
-                                className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-500/20 appearance-none bg-white pr-10" // Added pr-10 for arrow spacing
+                                className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-primary focus:ring-4 focus:ring-primary/20 appearance-none bg-white pr-10" // Added pr-10 for arrow spacing
                             >
                                 <option value="both">Live Music & Meals</option>
                                 <option value="music">Live Music Only</option>
@@ -127,10 +127,10 @@ export default function SearchForm({
                     type="submit" 
                     disabled={isLoading}
                     className="
-                        w-full bg-blue-600 text-white font-extrabold text-xl py-4 rounded-lg 
-                        shadow-xl shadow-blue-500/40 tracking-widest uppercase
+                        w-full bg-primary text-white font-extrabold text-xl py-4 rounded-lg 
+                        shadow-xl shadow-primary/40 tracking-widest uppercase
                         transition duration-200 ease-in-out
-                        hover:bg-blue-700 hover:shadow-2xl 
+                        hover:bg-primary-darker hover:shadow-2xl 
                         active:scale-[0.99] active:shadow-md
                         disabled:opacity-50 disabled:cursor-not-allowed
                         flex items-center justify-center space-x-3
