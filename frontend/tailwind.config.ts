@@ -30,20 +30,6 @@ const config: Config = {
       },
     },
   },
-  safelist: [
-    { pattern: /bg-(primary|secondary|highlight|dark-background|background|red|blue|green)-(\d{1,3})/ },
-    { pattern: /text-(primary|secondary|highlight|dark|white|gray|red|blue|green)-(\d{1,3})/ },
-    { pattern: /hover:text-(primary|secondary|highlight|dark|white|gray|red|blue|green)-(\d{1,3})/ },
-    { pattern: /hover:bg-(primary|secondary|highlight|dark-background|background|red|blue|green)-(\d{1,3})/ },
-    'text-white',
-    'text-gray-200',
-    'hover:text-white',
-    'hover:text-blue-400',
-    'bg-blue-500',
-    'bg-green-500',
-    'bg-red-500',
-    'bg-gray-800',
-  ],
   plugins: [],
 }
 export default config

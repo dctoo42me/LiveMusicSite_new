@@ -1,7 +1,4 @@
-@import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./tailwind.css";
 
 /* Custom base styles: Forces images to scale properly (Optional, but good practice) */
 @layer base {
