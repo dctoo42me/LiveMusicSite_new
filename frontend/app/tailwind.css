@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@source inline("bg-{primary,secondary,highlight,dark-background,background,red,blue,green}-{100,200,300,400,500,600,700,800,900}");
+@source inline("text-{primary,secondary,highlight,dark,white,gray,red,blue,green}-{100,200,300,400,500,600,700,800,900}");
+@source inline("hover:text-{primary,secondary,highlight,dark,white,gray,red,blue,green}-{100,200,300,400,500,600,700,800,900}");
