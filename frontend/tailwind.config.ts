@@ -6,17 +6,7 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}', // NextUI
-    {
-      raw: `
-        bg-primary bg-secondary bg-highlight bg-dark-background bg-background
-        text-primary text-secondary text-highlight text-dark text-white text-gray
-        hover:text-primary hover:text-secondary hover:text-highlight hover:text-dark hover:text-white hover:text-gray
-        from-primary to-secondary
-        bg-primary-darker hover:bg-primary-darker
-        focus:ring-primary focus:ring-primary/20 focus:border-primary border-primary shadow-primary/40
-      `,
-    },
+    './safelist.txt',
     // Or if using `src` directory:
     // './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
