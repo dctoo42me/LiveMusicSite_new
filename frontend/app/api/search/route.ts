@@ -1,7 +1,7 @@
 // frontend/app/api/search/route.ts
 
 // The environment variable should point to your Express backend URL (e.g., http://localhost:5000)
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
 /**
  * Handles incoming GET requests from the Next.js frontend search components.

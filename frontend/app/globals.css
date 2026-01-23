@@ -1,7 +1,11 @@
-@import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./tailwind.css";
+
+@theme {
+  --color-primary: #FF4A11;      /* Vibrant Orange-Red */
+  --color-secondary: #00B8D4;    /* Bright Cyan */
+  --color-dark-background: #1A1A1A; /* Deep Charcoal */
+  --color-highlight: #FFD700;    /* Gold */
+}
 
 /* Custom base styles: Forces images to scale properly (Optional, but good practice) */
 @layer base {
@@ -9,3 +13,9 @@
     height: auto;
   }
 }
+
+body {
+  background-color: var(--color-dark-background);
+  color: white;
+}
+

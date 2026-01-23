@@ -84,7 +84,7 @@ export default function HomePage() {
       
       <div className="text-center max-w-4xl mb-12">
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
-          Find Your Perfect <span className="text-blue-600">Tune</span> & <span className="text-red-500">Dine</span> Experience
+          Find Your Perfect <span className="text-blue-600">Tune</span> & <span className="text-pink-600">Dine</span> Experience
         </h1>
         <p className="text-xl text-gray-700">
           Discover local venues offering delicious meals paired with live music events near you.
@@ -92,16 +92,18 @@ export default function HomePage() {
       </div>
 
       {/* Main Search Area */}
-      <div className="w-full max-w-3xl bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Start Your Search</h2>
-        <SearchForm 
-          initialLocation={location}
-          initialDate={date}
-          initialType={type}
-          initialShowAdvancedFilters={showAdvancedFilters}
-          onSearchSubmit={handleFormSubmit}
-          isLoading={loading}
-        />
+      <div className="w-full max-w-3xl bg-gradient-to-br from-blue-500 to-pink-500 p-1 rounded-xl shadow-2xl">
+        <div className="bg-white p-6 md:p-10 rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Start Your Search</h2>
+          <SearchForm 
+            initialLocation={location}
+            initialDate={date}
+            initialType={type}
+            initialShowAdvancedFilters={showAdvancedFilters}
+            onSearchSubmit={handleFormSubmit}
+            isLoading={loading}
+          />
+        </div>
       </div>
 
       {/* Results Section */}

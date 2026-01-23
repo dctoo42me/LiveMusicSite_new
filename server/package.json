@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "npm run migrate up && node dist/index.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'sh -c \"npm run start:dev\"'",
+    "dev": "tsx watch src/index.ts",
     "start:dev": "npm run build && node -r dotenv/config dist/index.js",
     "test": "vitest",
     "build": "tsc",
@@ -39,6 +39,7 @@
     "nodemon": "^3.1.11",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   }

@@ -61,7 +61,7 @@ export default function SearchForm({
                     type="button"
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                     className="
-                        flex items-center space-x-2 text-blue-600 hover:text-blue-800 
+                        flex items-center space-x-2 text-blue-600 hover:text-blue-700
                         font-semibold text-sm transition-colors duration-200
                     "
                 >
@@ -105,7 +105,7 @@ export default function SearchForm({
                                 id="type"
                                 value={type}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setType(e.target.value)}
-                                className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-500/20 appearance-none bg-white pr-10" // Added pr-10 for arrow spacing
+                                className="w-full p-4 border-2 border-gray-200 text-gray-900 rounded-lg shadow-md transition duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 appearance-none bg-white pr-10" // Added pr-10 for arrow spacing
                             >
                                 <option value="both">Live Music & Meals</option>
                                 <option value="music">Live Music Only</option>

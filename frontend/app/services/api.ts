@@ -53,3 +53,12 @@ export async function getFavorites(token: string, limit: number, offset: number)
   });
   return res.json();
 }
+
+// Authentication API calls
+export async function logout(token: string) {
+  const res = await fetch(`${BASE_URL}/auth/logout`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  return res; // We expect a 200 OK from the backend, no content.
+}

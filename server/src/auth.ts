@@ -7,6 +7,7 @@ import logger from './utils/logger.js'; // Import logger
 import { Pool } from 'pg'; // Import Pool type for register/login
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_secret';
+logger.info(`JWT_SECRET is set to: ${JWT_SECRET ? '******' : 'undefined or default'}`);
 
 export async function register(pool: Pool, req: Request, res: Response) {
   const { username, email, password } = req.body;
@@ -77,4 +78,10 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
     logger.error('Token verification failed:', error); // Use logger
     return res.status(403).json({ error: 'Invalid or expired token.' });
   }
+}
+
+export async function logout(req: Request, res: Response) {
+  const userId = (req as any).user.userId; // userId is available from verifyToken middleware
+  logger.info(`User ${userId} logged out.`);
+  res.status(200).json({ message: 'Logged out successfully.' });
 }

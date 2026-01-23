@@ -46,10 +46,11 @@ export default function LoginForm() {
         <input
           type="text"
           id="login-username"
+          name="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
       </div>
       <div className="mb-6">
@@ -59,10 +60,12 @@ export default function LoginForm() {
         <input
           type="password"
           id="login-password"
+          name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          autocomplete="current-password"
+          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
       </div>
       <button

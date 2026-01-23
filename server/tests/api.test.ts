@@ -1,6 +1,9 @@
 import request from 'supertest';
 import { searchVenues } from '../src/venueRepository.ts'; // Moved to top
+import { createUser, findUserByUsername } from '../src/authRepository.ts';
+import { addFavorite, removeFavorite, getFavorites } from '../src/favoriteRepository.ts';
 import { vi } from 'vitest';
+import bcrypt from 'bcrypt';
 
 // We need to import the app from index.ts to test it.
 // However, to avoid circular dependencies and ensure a clean test environment,
@@ -39,6 +42,31 @@ vi.mock('../src/venueRepository.ts', () => ({
   searchVenues: vi.fn(),
 }));
 
+vi.mock('../src/authRepository.ts', () => ({
+  findUserByUsername: vi.fn(),
+  createUser: vi.fn(),
+}));
+
+vi.mock('../src/favoriteRepository.ts', () => ({
+  addFavorite: vi.fn(),
+  removeFavorite: vi.fn(),
+  getFavorites: vi.fn(),
+}));
+
+const { compare, hash } = vi.hoisted(() => {
+  return {
+    compare: vi.fn(),
+    hash: vi.fn(() => Promise.resolve('hashedpassword')),
+  }
+})
+
+vi.mock('bcrypt', () => ({
+  default: {
+    compare,
+    hash,
+  }
+}))
+
 describe('API Endpoints', () => {
   beforeAll(async () => {
     // Dynamically import the app after mocks are set up
@@ -57,6 +85,142 @@ describe('API Endpoints', () => {
     expect(res.statusCode).toEqual(200);
     expect(res.body.message).toEqual('LiveMusicSite API is running successfully!');
     expect(res.body.db_status).toEqual('Connected');
+  });
+
+  describe('POST /api/auth/register', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should register a new user successfully', async () => {
+      findUserByUsername.mockResolvedValue(null);
+      createUser.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com' });
+
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body.message).toEqual('User created successfully');
+    });
+
+    it('should return 409 if username already exists', async () => {
+      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com' });
+
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
+
+      expect(res.statusCode).toEqual(409);
+      expect(res.body.error).toEqual('Username already exists.');
+    });
+
+    it('should return 400 if required fields are missing', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ username: 'testuser' });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.error).toEqual('Username, email, and password are required.');
+    });
+  });
+
+  describe('POST /api/auth/login', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should log in an existing user and return a token', async () => {
+      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      compare.mockResolvedValue(true);
+      
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'testuser', password: 'password123' });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('token');
+    });
+
+    it('should return 401 for invalid username', async () => {
+      findUserByUsername.mockResolvedValue(null);
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'nonexistent', password: 'password123' });
+
+      expect(res.statusCode).toEqual(401);
+      expect(res.body.error).toEqual('Invalid username or password.');
+    });
+
+    it('should return 401 for incorrect password', async () => {
+      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      compare.mockResolvedValue(false);
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'testuser', password: 'wrongpassword' });
+
+      expect(res.statusCode).toEqual(401);
+      expect(res.body.error).toEqual('Invalid username or password.');
+    });
+
+    it('should return 400 if username or password missing', async () => {
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'testuser' });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.error).toEqual('Username and password are required.');
+    });
+  });
+
+  describe('/api/favorites', () => {
+    let token: string;
+
+    beforeAll(async () => {
+      // Create a user and get a token for testing protected routes
+      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      compare.mockResolvedValue(true);
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'testuser', password: 'password123' });
+      token = res.body.token;
+    });
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('POST / should add a favorite for an authenticated user', async () => {
+      addFavorite.mockResolvedValue({ id: 1, user_id: 1, venue_id: 1 });
+      const res = await request(app)
+        .post('/api/favorites')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ venueId: 1 });
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toHaveProperty('id', 1);
+    });
+
+    it('GET / should return favorites for an authenticated user', async () => {
+      getFavorites.mockResolvedValue({ venues: [{ id: 1, name: 'Favorite Venue' }], totalCount: 1 });
+      const res = await request(app)
+        .get('/api/favorites')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.venues).toHaveLength(1);
+    });
+
+    it('DELETE /:venueId should remove a favorite for an authenticated user', async () => {
+      removeFavorite.mockResolvedValue({ id: 1, user_id: 1, venue_id: 1 });
+      const res = await request(app)
+        .delete('/api/favorites/1')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(204);
+    });
   });
 
   describe('GET /api/venues/search', () => {

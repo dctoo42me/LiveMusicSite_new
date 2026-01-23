@@ -42,6 +42,7 @@ export async function getFavorites(pool, userId, limit, offset) {
         logger.error(`Redis cache read error for key ${cacheKey}:`, cacheError);
         // Continue to DB if cache read fails
     }
+    logger.info(`FINAL CHECK before query: userId=${userId} (type: ${typeof userId}), limit=${limit} (type: ${typeof limit}), offset=${offset} (type: ${typeof offset})`);
     // Query to get paginated favorite venues
     const venuesRes = await pool.query(`SELECT v.* FROM venues v JOIN favorite_venues f ON v.id = f.venue_id WHERE f.user_id = $1 ORDER BY v.name ASC LIMIT $2 OFFSET $3`, [userId, limit, offset]);
     // Query to get total count of favorite venues for the user

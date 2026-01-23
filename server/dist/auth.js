@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { createUser, findUserByUsername } from './authRepository.js';
 import logger from './utils/logger.js'; // Import logger
 const JWT_SECRET = process.env.JWT_SECRET || 'your_default_secret';
+logger.info(`JWT_SECRET is set to: ${JWT_SECRET ? '******' : 'undefined or default'}`);
 export async function register(pool, req, res) {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
@@ -62,5 +63,10 @@ export function verifyToken(req, res, next) {
         logger.error('Token verification failed:', error); // Use logger
         return res.status(403).json({ error: 'Invalid or expired token.' });
     }
+}
+export async function logout(req, res) {
+    const userId = req.user.userId; // userId is available from verifyToken middleware
+    logger.info(`User ${userId} logged out.`);
+    res.status(200).json({ message: 'Logged out successfully.' });
 }
 //# sourceMappingURL=auth.js.map

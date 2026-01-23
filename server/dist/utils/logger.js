@@ -1,8 +1,18 @@
 // server/src/utils/logger.ts
 import { createLogger, format, transports } from 'winston';
 const { combine, timestamp, printf, colorize, errors } = format;
-const logFormat = printf(({ level, message, timestamp, stack }) => {
-    return `${timestamp} ${level}: ${stack || message}`;
+const logFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
+    let log = `${timestamp} ${level}: ${stack || message}`;
+    if (Object.keys(meta).length) {
+        try {
+            log += ` ${JSON.stringify(meta, null, 2)}`;
+        }
+        catch (e) {
+            // handle circular structures
+            log += ' [unable to stringify meta]';
+        }
+    }
+    return log;
 });
 const logger = createLogger({
     level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',

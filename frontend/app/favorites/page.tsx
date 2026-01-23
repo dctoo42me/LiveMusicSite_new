@@ -132,7 +132,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Your Favorite Venues</h1>
+      <h1 className="text-3xl font-bold mb-6 text-white">Your Favorite Venues</h1> {/* Added text-white here */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {favorites.map((venue) => (
           <div key={venue.id} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1">

@@ -9,10 +9,10 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-background shadow-lg"> {/* Use dark-background */}
+    <header className="sticky top-0 z-50 bg-gray-800 shadow-lg"> {/* Use dark-background */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
-          <div className="text-2xl font-extrabold text-highlight hover:text-primary transition duration-300 cursor-pointer"> {/* Use highlight and primary hover */}
+          <div className="text-2xl font-extrabold text-white hover:text-blue-400 transition duration-300 cursor-pointer"> {/* Use highlight and primary hover */}
             Tune & Dine
           </div>
         </Link>
@@ -41,12 +41,12 @@ export default function Header() {
           ) : (
             <div className="space-x-4">
               <Link href="/login" passHref>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"> {/* Use secondary */}
+                <button className="bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 hover:scale-105 hover:shadow-lg transition duration-300"> {/* Use standard pink */}
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"> {/* Use primary */}
+                <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition duration-300"> {/* Use standard blue */}
                   Register
                 </button>
               </Link>
@@ -55,7 +55,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden text-highlight text-2xl hover:text-primary transition-colors duration-300" /* Use highlight and hover */
+          className="md:hidden text-white text-2xl hover:text-blue-400 transition-colors duration-300" /* Use standard classes */
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
@@ -64,7 +64,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-dark-background z-50 transform ${ /* Use dark-background */
+        className={`fixed top-0 left-0 w-full h-full bg-gray-800 z-50 transform ${ /* Use standard gray */
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
@@ -80,7 +80,6 @@ export default function Header() {
           <NavLink href="/music" text="Live Music" onClick={() => setIsMobileMenuOpen(false)} />
           <NavLink href="/meals" text="Meal Options" onClick={() => setIsMobileMenuOpen(false)} />
           <NavLink href="/about" text="About" onClick={() => setIsMobileMenuOpen(false)} />
-          {token && <NavLink href="/favorites" text="Favorites" onClick={() => setIsMobileMenuOpen(false)} />}
 
           {token ? (
             <>
@@ -99,12 +98,12 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 hover:scale-105 hover:shadow-lg transition duration-300 w-48 text-center">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center">
+                <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition duration-300 w-48 text-center">
                   Register
                 </button>
               </Link>
@@ -124,7 +123,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-highlight hover:text-primary font-medium transition duration-300"> {/* Use highlight and primary hover */}
+    <span className="text-gray-300 hover:text-blue-400 font-medium transition duration-300"> {/* Use highlight and primary hover */}
       {text}
     </span>
   </Link>
