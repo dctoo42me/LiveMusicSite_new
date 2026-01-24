@@ -5,17 +5,16 @@ import { NextRequest, NextResponse } from 'next/server';
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
 // Helper function to extract and sanitize the path
-async function getBackendPath(params: { path?: string[] } | Promise<{ path?: string[] }>): Promise<string> {
-  const resolvedParams = await Promise.resolve(params);
-  if (!resolvedParams || !resolvedParams.path || resolvedParams.path.length === 0) {
+async function getBackendPath(params: { path?: string[] | undefined }): Promise<string> {
+  if (!params || !params.path || params.path.length === 0) {
     return '';
   }
-  return resolvedParams.path.filter(segment => segment).join('/');
+  return params.path.filter(segment => segment).join('/');
 }
 
 async function handleProxyRequest(
   request: NextRequest,
-  params: { path?: string[] } | Promise<{ path?: string[] }>,
+  params: { path?: string[] | undefined },
   method: string
 ) {
   const path = await getBackendPath(params);
@@ -89,21 +88,21 @@ async function handleProxyRequest(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path?: string[] } }
+  context: { params: any }
 ) {
-  return handleProxyRequest(request, params, 'POST');
+  return handleProxyRequest(request, context.params, 'POST');
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path?: string[] } }
+  context: { params: any }
 ) {
-  return handleProxyRequest(request, params, 'GET');
+  return handleProxyRequest(request, context.params, 'GET');
 }
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { path?: string[] } }
+    context: { params: any }
   ) {
-    return handleProxyRequest(request, params, 'DELETE');
+    return handleProxyRequest(request, context.params, 'DELETE');
   }
