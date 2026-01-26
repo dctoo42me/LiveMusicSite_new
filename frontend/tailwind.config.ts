@@ -1,19 +1,23 @@
 import type { Config } from 'tailwindcss'
 
-const safelist = require('./safelist.js');
-
 const config: Config = {
   // Tell Tailwind to scan all these files for classes
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    ...safelist,
     // Or if using `src` directory:
     // './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        'dark-background': 'var(--color-dark-background)',
+        highlight: 'var(--color-highlight)',
+      },
+    },
   },
   plugins: [],
 }

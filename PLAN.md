@@ -13,25 +13,19 @@ This session began with the commencement protocol, which involved reviewing `PLA
 *   Necessary WSL dependencies for Playwright browsers were installed using `sudo npx playwright install-deps`.
 *   The `frontend/playwright.config.ts` was updated to enable `webServer` for automatic server management during tests.
 *   The `frontend/next.config.ts` was updated with `rewrites` to correctly proxy `/api` requests to the backend server running on port 5001.
-*   The `frontend/app/services/api.ts` `post` function was modified to throw errors on non-`ok` HTTP responses for more robust error handling.
-*   A logging statement for `JWT_SECRET` was added to `server/src/auth.ts` and confirmed to be set correctly.
+*   The `frontend/app/services/api.ts` `post` function was modified to throw errors on non-`ok` HTTP responses for more robust error handling (this change has been reverted as it was not the root cause).
+*   A logging statement for `JWT_SECRET` was added to `server/src/auth.ts` and confirmed to be set correctly (this change has been reverted).
+*   The TypeScript error in `server/src/venueRepository.ts` was fixed.
+*   Confirmed that the backend server is accessible via `localhost:5001` from within the WSL environment (manual test with `curl` successful).
 
-**Development Environment & Configuration Fixes (Completed):**
-*   **Build Process (`tsx`):** Confirmed working reliably.
-*   **Database Connection (`dotenv`):** Confirmed working reliably.
-*   **Frontend/Backend Port Sync:** Confirmed working reliably via `next.config.ts` rewrites.
-
-**API Proxy Fixes (Completed):**
-*   The API proxies for both authentication (`/api/auth`) and favorites (`/api/auth`) are now correctly configured via `next.config.ts` rewrites.
-
-**Core Application Functionality (Completed & Verified):**
-*   **Venue Search (Phase 4, Test 3):** Completed in a previous session and remains functional.
-*   **Add/Remove Favorite (Phase 4, Test 4):** Completed in a previous session and remains functional.
-*   **View Favorites (Phase 4, Test 5):** Completed in a previous session and remains functional.
-*   **Logout (Phase 4, Test 6):** Completed in a previous session and remains functional.
+**Vercel Deployment Status (FAILED):**
+*   **TypeScript Error**: The Vercel build failed due to a TypeScript error: `Property 'params' does not exist on type 'NextRequest'` in both `frontend/app/api/auth/[...path]/route.ts` and `frontend/app/api/favorites/[[...path]]/route.ts`. This was due to an incompatibility with how the Vercel build environment was interpreting the `params` type in Next.js route handlers.
+    *   **Fix Applied**: Modified both route files to explicitly cast `context.params` to `any` to bypass this type incompatibility.
+*   **Vercel CLI Error**: The `vercel pull` step failed with `Error: unknown or unexpected option: --project`. This indicates that the Vercel CLI version in GitHub Actions did not support the `--project` flag in `vercel pull`.
+    *   **Fix Applied**: Removed `--project=${{ secrets.VERCEL_PROJECT_ID }}` from the `vercel pull` command in `.github/workflows/frontend-deploy.yml`.
 
 **Next Action (Gemini):**
-To resume work, the immediate next step is to continue with **Phase 5: Deployment & CI/CD**, focusing on automating the build, test, and deployment processes.
+To resume work, the immediate next step is to monitor the new Vercel frontend deployment (triggered by the latest force push) to see if the applied fixes resolve the build and deployment errors.
 ### The Path Forward: Incremental Integration from a Pristine Base
 Our strategy moving forward is to establish a completely fresh, WSL-native Next.js and Tailwind CSS frontend project. We will then methodically and incrementally integrate the existing application code (components, pages, contexts, services) into this new, verified, and stable environment. This approach prioritizes verification at each step to ensure stability and functionality, preventing further regressions.
 

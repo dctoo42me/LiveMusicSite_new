@@ -9,10 +9,10 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-800 shadow-lg"> {/* Use dark-background */}
+    <header className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link href="/" passHref>
-          <div className="text-2xl font-extrabold text-white hover:text-blue-400 transition duration-300 cursor-pointer"> {/* Use highlight and primary hover */}
+          <div className="text-2xl font-extrabold text-white hover:text-primary transition duration-300 cursor-pointer">
             Tune & Dine
           </div>
         </Link>
@@ -27,13 +27,13 @@ export default function Header() {
           {token ? (
             <div className="space-x-4">
               <Link href="/favorites" passHref>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300">
                   My Favorites
                 </button>
               </Link>
               <button
                 onClick={logout}
-                className="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300"
+                className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300"
               >
                 Logout
               </button>
@@ -41,12 +41,12 @@ export default function Header() {
           ) : (
             <div className="space-x-4">
               <Link href="/login" passHref>
-                <button className="bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 hover:scale-105 hover:shadow-lg transition duration-300"> {/* Use standard pink */}
+                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref>
-                <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition duration-300"> {/* Use standard blue */}
+                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300">
                   Register
                 </button>
               </Link>
@@ -55,7 +55,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden text-white text-2xl hover:text-blue-400 transition-colors duration-300" /* Use standard classes */
+          className="md:hidden text-white text-2xl hover:text-primary transition-colors duration-300"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
@@ -64,7 +64,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-gray-800 z-50 transform ${ /* Use standard gray */
+        className={`fixed top-0 left-0 w-full h-full bg-gray-900 z-50 transform ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
@@ -84,13 +84,13 @@ export default function Header() {
           {token ? (
             <>
               <Link href="/favorites" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300 w-48 text-center">
+                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300 w-48 text-center">
                   My Favorites
                 </button>
               </Link>
               <button
                 onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                className="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-90 transition duration-300 w-48 text-center"
+                className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300 w-48 text-center"
               >
                 Logout
               </button>
@@ -98,12 +98,12 @@ export default function Header() {
           ) : (
             <>
               <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 hover:scale-105 hover:shadow-lg transition duration-300 w-48 text-center">
+                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300 w-48 text-center">
                   Login
                 </button>
               </Link>
               <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition duration-300 w-48 text-center">
+                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300 w-48 text-center">
                   Register
                 </button>
               </Link>
@@ -123,7 +123,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
   <Link href={href} passHref onClick={onClick}>
-    <span className="text-gray-300 hover:text-blue-400 font-medium transition duration-300"> {/* Use highlight and primary hover */}
+    <span className="text-gray-300 hover:text-secondary font-medium transition duration-300">
       {text}
     </span>
   </Link>
