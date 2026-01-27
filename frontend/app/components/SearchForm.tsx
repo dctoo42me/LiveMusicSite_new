@@ -40,7 +40,7 @@ export default function SearchForm({
                 
                 {/* Input 1: Location */}
                 <div>
-                    <label htmlFor="location" className="block text-sm font-medium text-gray-300 mb-1"> 
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1"> 
                         Location
                     </label>
                     <input
@@ -49,7 +49,7 @@ export default function SearchForm({
                         value={location}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)}
                         placeholder="City, State, or Zip Code"
-                        className="w-full p-4 bg-gray-800 border-2 border-gray-600 text-white placeholder:text-gray-400 rounded-lg shadow-inner transition duration-200 focus:border-primary focus:ring-2 focus:ring-primary/50" 
+                        className="w-full p-4 bg-white border-2 border-gray-200 text-gray-900 placeholder:text-gray-500 rounded-lg shadow-inner transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" 
                         required
                     />
                 </div>
@@ -61,7 +61,7 @@ export default function SearchForm({
                     type="button"
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                     className="
-                        flex items-center space-x-2 text-secondary hover:text-secondary/80
+                        flex items-center space-x-2 text-blue-500 hover:text-blue-600
                         font-semibold text-sm transition-colors duration-200
                     "
                 >
@@ -83,7 +83,7 @@ export default function SearchForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"> {/* Grid for advanced filters */}
                     {/* Input 2: Date */}
                     <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-gray-300 mb-1">
+                        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
                             Date
                         </label>
                         <input
@@ -91,13 +91,13 @@ export default function SearchForm({
                             type="date"
                             value={date}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
-                            className="w-full p-4 bg-gray-800 border-2 border-gray-600 text-white rounded-lg shadow-inner transition duration-200 focus:border-primary focus:ring-2 focus:ring-primary/50"
+                            className="w-full p-4 bg-white border-2 border-gray-200 text-gray-900 rounded-lg shadow-inner transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
 
                     {/* Input 3: Type Selector */}
                     <div>
-                        <label htmlFor="type" className="block text-sm font-medium text-gray-300 mb-1">
+                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
                             Looking For
                         </label>
                         <div className="relative">
@@ -105,13 +105,13 @@ export default function SearchForm({
                                 id="type"
                                 value={type}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setType(e.target.value)}
-                                className="w-full p-4 bg-gray-800 border-2 border-gray-600 text-white rounded-lg shadow-inner transition duration-200 focus:border-primary focus:ring-2 focus:ring-primary/50 appearance-none pr-10"
+                                className="w-full p-4 bg-white border-2 border-gray-200 text-gray-900 rounded-lg shadow-inner transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 appearance-none pr-10"
                             >
                                 <option value="both">Live Music & Meals</option>
                                 <option value="music">Live Music Only</option>
                                 <option value="meals">Meal Options Only</option>
                             </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                                 </svg>
@@ -127,10 +127,10 @@ export default function SearchForm({
                     type="submit" 
                     disabled={isLoading}
                     className="
-                        w-full bg-primary text-white font-extrabold text-xl py-4 rounded-lg 
-                        shadow-lg shadow-primary/30 tracking-widest uppercase
+                        w-full bg-indigo-600 text-white font-extrabold text-xl py-4 rounded-lg 
+                        shadow-lg shadow-indigo-600/30 tracking-widest uppercase
                         transition duration-200 ease-in-out
-                        hover:bg-primary/80 hover:shadow-primary/50
+                        hover:bg-indigo-700 hover:shadow-indigo-700/30
                         active:scale-[0.99]
                         disabled:opacity-50 disabled:cursor-not-allowed
                         flex items-center justify-center space-x-3

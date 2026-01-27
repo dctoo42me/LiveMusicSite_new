@@ -80,21 +80,25 @@ export default function HomePage() {
   };
   
   return (
-    <div className="page-content flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="page-content flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
       
       <div className="text-center max-w-4xl mb-12">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-4">
-          Find Your Perfect <span className="text-primary">Tune</span> & <span className="text-secondary">Dine</span> Experience
+        <h1 className="text-5xl md:text-6xl font-extrabold text-blue-800 leading-tight mb-4">
+          Find Your Perfect <span className="text-blue-500">Tune</span> & <span className="text-green-500">Dine</span> Experience
         </h1>
-        <p className="text-xl text-gray-300">
+        <p className="text-xl text-gray-700">
           Discover local venues offering delicious meals paired with live music events near you.
         </p>
       </div>
 
+      {/* Tailwind Responsive Test */}
+      <div className="bg-red-500 hidden md:block text-white p-4">Desktop Only (Red)</div>
+      <div className="bg-green-500 md:hidden text-white p-4">Mobile Only (Green)</div>
+
       {/* Main Search Area */}
-      <div className="w-full max-w-3xl bg-gray-800/20 p-1 rounded-xl shadow-2xl">
-        <div className="bg-gray-900 p-6 md:p-10 rounded-lg">
-          <h2 className="text-2xl font-semibold text-white mb-6">Start Your Search</h2>
+      <div className="w-full max-w-3xl bg-blue-100 p-1 rounded-xl shadow-2xl">
+        <div className="bg-white p-6 md:p-10 rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Start Your Search</h2>
           <SearchForm 
             initialLocation={location}
             initialDate={date}

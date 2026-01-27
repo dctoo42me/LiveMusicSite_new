@@ -78,8 +78,8 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
     return (
       <div className="flex justify-center items-center p-10">
         <div className="flex flex-col items-center space-y-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-          <p className="text-lg text-primary font-semibold">Loading venues...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          <p className="text-lg text-blue-600 font-semibold">Loading venues...</p>
         </div>
       </div>
     );
@@ -87,14 +87,14 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
 
   if (error) {
     return (
-      <div className="flex justify-center items-center p-10 bg-red-900/20 border border-red-500/30 rounded-lg text-red-300">
+      <div className="flex justify-center items-center p-10 bg-red-50 border border-red-200 rounded-lg text-red-700">
         <div className="flex flex-col items-center space-y-3">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-xl font-bold">Error!</p>
           <p className="text-md">{error}</p>
-          <p className="text-sm text-gray-400">Please try again later.</p>
+          <p className="text-sm text-gray-500">Please try again later.</p>
         </div>
       </div>
     );
@@ -102,9 +102,9 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
 
   if (venues.length === 0) {
     return (
-      <div className="flex justify-center items-center p-10 bg-gray-800/20 rounded-lg text-gray-400">
+      <div className="flex justify-center items-center p-10 bg-gray-50 rounded-lg text-gray-700">
         <div className="flex flex-col items-center space-y-3">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-xl font-bold">No Venues Found</p>
@@ -118,18 +118,18 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {venues.map((venue) => (
-          <div key={venue.id} className="bg-gray-900/50 rounded-xl shadow-lg overflow-hidden border border-gray-700/50 hover:shadow-primary/20 hover:border-primary/50 transition-all duration-300 transform hover:-translate-y-1">
+          <div key={venue.id} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1">
             <div className="p-6">
               <div className="mb-4 flex justify-between items-start">
                 <div>
-                  <p className="text-xs text-secondary font-bold uppercase tracking-widest">{venue.type === 'both' ? 'Music & Dining' : venue.type}</p>
-                  <h3 className="text-2xl font-extrabold text-white mt-2 leading-tight">{venue.name}</h3>
-                  <p className="text-sm text-gray-400 mt-1">{venue.city}, {venue.state}</p>
+                  <p className="text-xs text-blue-600 font-bold uppercase tracking-widest">{venue.type === 'both' ? 'Music & Dining' : venue.type}</p>
+                  <h3 className="text-2xl font-extrabold text-gray-900 mt-2 leading-tight">{venue.name}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{venue.city}, {venue.state}</p>
                 </div>
                 {token && (
                   <button
                     onClick={() => handleToggleFavorite(venue.id)}
-                    className={`p-2 rounded-full transition-colors duration-200 ${favoritedVenueIds.has(venue.id) ? 'bg-primary text-white hover:bg-primary/80' : 'bg-gray-800 text-gray-400 hover:bg-primary/20 hover:text-primary'}`}
+                    className={`p-2 rounded-full transition-colors duration-200 ${favoritedVenueIds.has(venue.id) ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500'}`}
                     title={favoritedVenueIds.has(venue.id) ? 'Remove from Favorites' : 'Add to Favorites'}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,11 +139,11 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                 )}
               </div>
               
-              <p className="text-gray-300 mb-6 text-sm leading-relaxed h-16 overflow-hidden">{venue.description || 'No description available.'}</p>
+              <p className="text-gray-700 mb-6 text-sm leading-relaxed h-16 overflow-hidden">{venue.description || 'No description available.'}</p>
 
-              <div className="flex justify-between items-center pt-4 border-t border-gray-700/50">
-                  <p className="text-xs font-medium text-gray-400 flex items-center space-x-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                  <p className="text-xs font-medium text-gray-500 flex items-center space-x-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h.01M7 12h.01M7 16h.01M16 12h.01M16 16h.01M12 16h.01M12 12h.01M9 16h.01M9 12h.01M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <span>{new Date(venue.date).toLocaleDateString()}</span>
@@ -153,7 +153,7 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                           href={venue.website} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="bg-secondary text-white font-bold py-2 px-4 rounded-full text-sm hover:bg-secondary/80 transition-colors duration-200 shadow-md"
+                          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-sm hover:bg-blue-700 transition-colors duration-200 shadow-md"
                       >
                           Visit Site
                       </a>
@@ -170,17 +170,17 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/80 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             Previous
           </button>
-          <span className="text-lg font-semibold text-white">
+          <span className="text-lg font-semibold text-gray-800">
             Page {currentPage} of {totalPages}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/80 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             Next
           </button>
