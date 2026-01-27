@@ -1,130 +1,42 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
   const { token, logout } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-lg shadow-lg">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+    <div className="w-full navbar bg-dark-background text-white shadow-lg">
+      <div className="flex-none lg:hidden">
+        <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </label>
+      </div>
+      <div className="flex-1 px-2 mx-2 text-2xl font-extrabold">
         <Link href="/" passHref>
-          <div className="text-2xl font-extrabold text-white hover:text-primary transition duration-300 cursor-pointer">
-            Tune & Dine
-          </div>
+          <span className="cursor-pointer hover:text-primary transition-colors duration-300">Tune & Dine</span>
         </Link>
-
-        <nav className="hidden md:flex space-x-6 items-center">
-          <NavLink href="/music" text="Live Music" />
-          <NavLink href="/meals" text="Meal Options" />
-          <NavLink href="/about" text="About" />
-        </nav>
-
-        <div className="hidden md:block">
-          {token ? (
-            <div className="space-x-4">
-              <Link href="/favorites" passHref>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300">
-                  My Favorites
-                </button>
-              </Link>
-              <button
-                onClick={logout}
-                className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="space-x-4">
-              <Link href="/login" passHref>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300">
-                  Login
-                </button>
-              </Link>
-              <Link href="/register" passHref>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300">
-                  Register
-                </button>
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <button
-          className="md:hidden text-white text-2xl hover:text-primary transition-colors duration-300"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          ☰
-        </button>
       </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`fixed top-0 left-0 w-full h-full bg-gray-900 z-50 transform ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out md:hidden`}
-      >
-        <div className="flex justify-end p-4">
-          <button
-            className="text-white text-3xl"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            &times;
-          </button>
-        </div>
-        <nav className="flex flex-col items-center space-y-8 mt-10">
-          <NavLink href="/music" text="Live Music" onClick={() => setIsMobileMenuOpen(false)} />
-          <NavLink href="/meals" text="Meal Options" onClick={() => setIsMobileMenuOpen(false)} />
-          <NavLink href="/about" text="About" onClick={() => setIsMobileMenuOpen(false)} />
-
+      <div className="flex-none hidden lg:block">
+        <ul className="menu menu-horizontal items-center space-x-2">
+          <li><Link href="/music" passHref><span className="hover:text-primary transition-colors duration-300">Live Music</span></Link></li>
+          <li><Link href="/meals" passHref><span className="hover:text-primary transition-colors duration-300">Meal Options</span></Link></li>
+          <li><Link href="/about" passHref><span className="hover:text-primary transition-colors duration-300">About</span></Link></li>
+          
           {token ? (
             <>
-              <Link href="/favorites" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300 w-48 text-center">
-                  My Favorites
-                </button>
-              </Link>
-              <button
-                onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300 w-48 text-center"
-              >
-                Logout
-              </button>
+              <li><Link href="/favorites" passHref><button className="btn btn-primary btn-sm">My Favorites</button></Link></li>
+              <li><button onClick={logout} className="btn btn-secondary btn-sm">Logout</button></li>
             </>
           ) : (
             <>
-              <Link href="/login" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/80 transition duration-300 w-48 text-center">
-                  Login
-                </button>
-              </Link>
-              <Link href="/register" passHref onClick={() => setIsMobileMenuOpen(false)}>
-                <button className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-secondary/80 transition duration-300 w-48 text-center">
-                  Register
-                </button>
-              </Link>
+              <li><Link href="/login" passHref><button className="btn btn-primary btn-sm">Login</button></Link></li>
+              <li><Link href="/register" passHref><button className="btn btn-secondary btn-sm">Register</button></Link></li>
             </>
           )}
-        </nav>
+        </ul>
       </div>
-    </header>
+    </div>
   );
 }
-
-interface NavLinkProps {
-  href: string;
-  text: string;
-  onClick?: () => void; // Add optional onClick handler
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ href, text, onClick }) => (
-  <Link href={href} passHref onClick={onClick}>
-    <span className="text-gray-300 hover:text-secondary font-medium transition duration-300">
-      {text}
-    </span>
-  </Link>
-);
