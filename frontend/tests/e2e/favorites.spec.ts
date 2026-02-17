@@ -12,13 +12,10 @@ test.describe('Favorites Functionality', () => {
     await page.fill('input[name="email"]', `${randomUsername}@example.com`);
     await page.fill('input[name="password"]', randomPassword);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/register'); // Expect to stay on the register page
-    // Assuming toast is displayed correctly after registration, but not asserting its visibility across explicit navigation.
-    // Now navigate to login page explicitly
-    await page.goto('/login');
+    await expect(page).toHaveURL('/login'); // Expect redirect to login
 
     // 2. Log in with the new user
-    await page.fill('input[name="username"]', randomUsername);
+    await page.fill('input[name="email"]', `${randomUsername}@example.com`);
     await page.fill('input[name="password"]', randomPassword);
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL('/'); // Assert redirection to homepage
@@ -27,20 +24,20 @@ test.describe('Favorites Functionality', () => {
     await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible(); // Verify logged in
 
     // 3. Search for a venue
-    await page.getByPlaceholder('City, State, or Zip Code').fill('Austin, TX');
-    await page.getByRole('button', { name: 'Show Advanced Filters' }).click();
-    await page.waitForLoadState('domcontentloaded');
-    await page.locator('input#date').fill('2025-12-25');
-    await page.locator('select#type').selectOption('music');
-    await page.getByRole('button', { name: 'Search Now' }).click();
+    await page.getByRole('textbox', { name: 'Location' }).fill('Austin, TX');
+    await page.getByRole('button', { name: 'More Search Options' }).click();
+    await page.getByLabel('From Date').fill('2025-12-25');
+    await page.getByLabel('Type', { exact: true }).click();
+    await page.getByRole('option', { name: 'Music Only' }).click();
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
     
     // Wait for search results to appear
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('.bg-white.rounded-xl.shadow-lg.overflow-hidden')).toBeVisible();
+    await expect(page.locator('.MuiCard-root').first()).toBeVisible();
 
     // 4. Add a venue to favorites
     // Find the ACL Live card and click its favorite button
-    const aclLiveCard = page.locator(`.bg-white.rounded-xl.shadow-lg.overflow-hidden:has-text("${venueNameToFavorite}")`);
+    const aclLiveCard = page.getByTestId('search-results').locator(`.MuiCard-root:has-text("${venueNameToFavorite}")`).first();
     await expect(aclLiveCard).toBeVisible();
     await aclLiveCard.getByRole('button', { name: 'Add to Favorites' }).click();
     await expect(page.getByText('Venue added to favorites!')).toBeVisible(); // Verify toast

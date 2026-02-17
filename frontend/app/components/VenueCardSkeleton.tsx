@@ -1,27 +1,48 @@
+// frontend/app/components/VenueCardSkeleton.tsx
 import React from 'react';
+import { Card, CardContent, CardActions, Box, Skeleton, Grid } from '@mui/material';
 
 const VenueCardSkeleton = () => {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-      <div className="p-6 animate-pulse">
-        <div className="mb-4 flex justify-between items-start">
-          <div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-8 bg-gray-300 rounded w-3/4 mt-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mt-1"></div>
-          </div>
-          <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-        </div>
-        
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-
-        <div className="flex justify-between items-center pt-4 mt-6 border-t border-gray-100">
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-10 w-24 bg-gray-300 rounded-full"></div>
-        </div>
-      </div>
-    </div>
+    <Card
+      variant="elevation"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        maxWidth: 400,
+        borderRadius: 2,
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Skeleton variant="rectangular" height={140} animation="wave" />
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Skeleton variant="rounded" width={60} height={20} animation="wave" />
+            <Skeleton variant="rounded" width={60} height={20} animation="wave" />
+          </Box>
+          <Skeleton variant="circular" width={32} height={32} animation="wave" />
+        </Box>
+        <Skeleton variant="text" width="80%" height={32} animation="wave" />
+        <Skeleton variant="text" width="40%" height={20} animation="wave" />
+        <Box sx={{ mt: 2 }}>
+          <Skeleton variant="text" width="100%" animation="wave" />
+          <Skeleton variant="text" width="100%" animation="wave" />
+          <Skeleton variant="text" width="60%" animation="wave" />
+        </Box>
+      </CardContent>
+      <CardActions sx={{ p: 2, pt: 0 }}>
+        <Box sx={{ width: '100%' }}>
+          <Skeleton variant="rectangular" width="100%" height={36} sx={{ mb: 1, borderRadius: 1 }} animation="wave" />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Skeleton variant="rectangular" width="50%" height={32} sx={{ borderRadius: 1 }} animation="wave" />
+            <Skeleton variant="rectangular" width="50%" height={32} sx={{ borderRadius: 1 }} animation="wave" />
+          </Box>
+        </Box>
+      </CardActions>
+    </Card>
   );
 };
 

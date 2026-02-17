@@ -1,7 +1,8 @@
 import request from 'supertest';
 import { searchVenues } from '../src/venueRepository.ts'; // Moved to top
-import { createUser, findUserByUsername } from '../src/authRepository.ts';
+import { createUser, findUserByEmail } from '../src/authRepository.ts';
 import { addFavorite, removeFavorite, getFavorites } from '../src/favoriteRepository.ts';
+import { addSavedEvent, removeSavedEvent, getSavedEvents } from '../src/savedEventRepository.ts';
 import { vi } from 'vitest';
 import bcrypt from 'bcrypt';
 
@@ -43,7 +44,7 @@ vi.mock('../src/venueRepository.ts', () => ({
 }));
 
 vi.mock('../src/authRepository.ts', () => ({
-  findUserByUsername: vi.fn(),
+  findUserByEmail: vi.fn(),
   createUser: vi.fn(),
 }));
 
@@ -51,6 +52,12 @@ vi.mock('../src/favoriteRepository.ts', () => ({
   addFavorite: vi.fn(),
   removeFavorite: vi.fn(),
   getFavorites: vi.fn(),
+}));
+
+vi.mock('../src/savedEventRepository.ts', () => ({
+  addSavedEvent: vi.fn(),
+  removeSavedEvent: vi.fn(),
+  getSavedEvents: vi.fn(),
 }));
 
 const { compare, hash } = vi.hoisted(() => {
@@ -93,7 +100,7 @@ describe('API Endpoints', () => {
     });
 
     it('should register a new user successfully', async () => {
-      findUserByUsername.mockResolvedValue(null);
+      findUserByEmail.mockResolvedValue(null);
       createUser.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com' });
 
       const res = await request(app)
@@ -104,15 +111,15 @@ describe('API Endpoints', () => {
       expect(res.body.message).toEqual('User created successfully');
     });
 
-    it('should return 409 if username already exists', async () => {
-      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com' });
+    it('should return 409 if email already exists', async () => {
+      findUserByEmail.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com' });
 
       const res = await request(app)
         .post('/api/auth/register')
         .send({ username: 'testuser', email: 'test@example.com', password: 'password123' });
 
       expect(res.statusCode).toEqual(409);
-      expect(res.body.error).toEqual('Username already exists.');
+      expect(res.body.error).toEqual('Email already exists.');
     });
 
     it('should return 400 if required fields are missing', async () => {
@@ -131,47 +138,47 @@ describe('API Endpoints', () => {
     });
 
     it('should log in an existing user and return a token', async () => {
-      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      findUserByEmail.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com', password_hash: 'hashedpassword' });
       compare.mockResolvedValue(true);
       
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ username: 'testuser', password: 'password123' });
+        .send({ email: 'test@example.com', password: 'password123' });
 
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty('token');
     });
 
-    it('should return 401 for invalid username', async () => {
-      findUserByUsername.mockResolvedValue(null);
+    it('should return 401 for invalid email', async () => {
+      findUserByEmail.mockResolvedValue(null);
 
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ username: 'nonexistent', password: 'password123' });
+        .send({ email: 'nonexistent@example.com', password: 'password123' });
 
       expect(res.statusCode).toEqual(401);
-      expect(res.body.error).toEqual('Invalid username or password.');
+      expect(res.body.error).toEqual('Invalid email or password.');
     });
 
     it('should return 401 for incorrect password', async () => {
-      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      findUserByEmail.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com', password_hash: 'hashedpassword' });
       compare.mockResolvedValue(false);
 
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ username: 'testuser', password: 'wrongpassword' });
+        .send({ email: 'test@example.com', password: 'wrongpassword' });
 
       expect(res.statusCode).toEqual(401);
-      expect(res.body.error).toEqual('Invalid username or password.');
+      expect(res.body.error).toEqual('Invalid email or password.');
     });
 
-    it('should return 400 if username or password missing', async () => {
+    it('should return 400 if email or password missing', async () => {
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ username: 'testuser' });
+        .send({ email: 'test@example.com' });
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body.error).toEqual('Username and password are required.');
+      expect(res.body.error).toEqual('Email and password are required.');
     });
   });
 
@@ -180,11 +187,11 @@ describe('API Endpoints', () => {
 
     beforeAll(async () => {
       // Create a user and get a token for testing protected routes
-      findUserByUsername.mockResolvedValue({ id: 1, username: 'testuser', password_hash: 'hashedpassword' });
+      findUserByEmail.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com', password_hash: 'hashedpassword' });
       compare.mockResolvedValue(true);
       const res = await request(app)
         .post('/api/auth/login')
-        .send({ username: 'testuser', password: 'password123' });
+        .send({ email: 'test@example.com', password: 'password123' });
       token = res.body.token;
     });
 
@@ -223,6 +230,53 @@ describe('API Endpoints', () => {
     });
   });
 
+  describe('/api/saved-events', () => {
+    let token: string;
+
+    beforeAll(async () => {
+      findUserByEmail.mockResolvedValue({ id: 1, username: 'testuser', email: 'test@example.com', password_hash: 'hashedpassword' });
+      compare.mockResolvedValue(true);
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'test@example.com', password: 'password123' });
+      token = res.body.token;
+    });
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('POST / should save an event for an authenticated user', async () => {
+      addSavedEvent.mockResolvedValue({ id: 1, user_id: 1, event_id: 101 });
+      const res = await request(app)
+        .post('/api/saved-events')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ eventId: 101 });
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toHaveProperty('id', 1);
+    });
+
+    it('GET / should return saved events for an authenticated user', async () => {
+      getSavedEvents.mockResolvedValue([{ id: 1, eventId: 101, venueName: 'Test Venue' }]);
+      const res = await request(app)
+        .get('/api/saved-events')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveLength(1);
+    });
+
+    it('DELETE /:eventId should remove a saved event for an authenticated user', async () => {
+      removeSavedEvent.mockResolvedValue({ id: 1, user_id: 1, event_id: 101 });
+      const res = await request(app)
+        .delete('/api/saved-events/101')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(204);
+    });
+  });
+
   describe('GET /api/venues/search', () => {
     beforeEach(() => {
       // Clear all mocks before each test
@@ -232,7 +286,7 @@ describe('API Endpoints', () => {
     it('should return 400 if no search parameters are provided', async () => {
       const res = await request(app).get('/api/venues/search');
       expect(res.statusCode).toEqual(400);
-      expect(res.body.error).toEqual('At least one search parameter (location, date, or type) is required.');
+      expect(res.body.error).toEqual('At least one search parameter (location, startDate, endDate, or type) is required.');
     });
 
     it('should return venues including website for valid search with type "both"', async () => {
@@ -260,7 +314,7 @@ describe('API Endpoints', () => {
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Test Venue');
       expect(res.body.venues[0].website).toEqual('http://testvenue.com');
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Austin', '', 'both', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Austin', '', '', 'both', 10, 0);
     });
 
     it('should filter by type "music" correctly', async () => {
@@ -285,7 +339,7 @@ describe('API Endpoints', () => {
       const res = await request(app).get('/api/venues/search?location=Dallas&type=music');
       expect(res.statusCode).toEqual(200);
       expect(res.body.venues[0].type).toEqual('music');
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', 'music', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', '', 'music', 10, 0);
     });
 
     it('should handle empty search results gracefully', async () => {
@@ -313,7 +367,7 @@ describe('API Endpoints', () => {
       const res = await request(app).get('/api/venues/search?location=Houston&limit=5&offset=10');
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(5);
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', 'both', 5, 10);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', '', 'both', 5, 10);
     });
 
     it('should return 500 if searchVenues throws an error', async () => {
@@ -324,17 +378,17 @@ describe('API Endpoints', () => {
       expect(res.body.error).toEqual('Failed to execute venue search.');
     });
 
-    it('should call searchVenues with date when only date is provided', async () => {
+    it('should call searchVenues with startDate when startDate is provided', async () => {
       searchVenues.mockResolvedValue({
         totalCount: 1,
         venues: [{ id: 4, name: 'Date Specific Venue', city: 'Anywhere', state: 'Anystate', date: '2026-02-15', type: 'comedy', description: 'desc', website: 'http://date.com', imageUrl: null }],
       });
 
-      const res = await request(app).get('/api/venues/search?date=2026-02-15');
+      const res = await request(app).get('/api/venues/search?startDate=2026-02-15');
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Date Specific Venue');
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), '', '2026-02-15', 'both', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), '', '2026-02-15', '', 'both', 10, 0);
     });
 
     it('should call searchVenues with location and type when date is not provided', async () => {
@@ -347,7 +401,7 @@ describe('API Endpoints', () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body.count).toEqual(1);
       expect(res.body.venues[0].name).toEqual('Location Type Venue');
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', 'jazz', 10, 0);
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Dallas', '', '', 'jazz', 10, 0);
     });
 
     it('should handle negative limit by using a minimum limit of 1', async () => {
@@ -358,7 +412,7 @@ describe('API Endpoints', () => {
 
       const res = await request(app).get('/api/venues/search?location=Houston&limit=-5');
       expect(res.statusCode).toEqual(200);
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', 'both', 1, 0); // Expect limit to be 1
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Houston', '', '', 'both', 1, 0); // Expect limit to be 1
     });
 
     it('should handle negative offset by using a minimum offset of 0', async () => {
@@ -369,7 +423,7 @@ describe('API Endpoints', () => {
 
       const res = await request(app).get('/api/venues/search?location=Miami&offset=-10');
       expect(res.statusCode).toEqual(200);
-      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Miami', '', 'both', 10, 0); // Expect offset to be 0
+      expect(searchVenues).toHaveBeenCalledWith(expect.any(Object), 'Miami', '', '', 'both', 10, 0); // Expect offset to be 0
     });
   });
 });

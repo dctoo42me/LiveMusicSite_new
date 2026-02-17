@@ -3,30 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "next": "16.0.10",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@googlemaps/js-api-loader": "^2.0.2",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
+    "@vis.gl/react-google-maps": "^1.7.1",
+    "jwt-decode": "^4.0.0",
+    "next": "^16.1.6",
     "pos": "^0.4.2",
-    "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.22",
-    "daisyui": "^5.5.14",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "postcss": "^8.5.6",
     "postcss-import": "^16.1.1",
-    "tailwindcss": "^4.0.0",
     "typescript": "^5"
   }
 }

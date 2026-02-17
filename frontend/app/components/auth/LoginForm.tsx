@@ -1,14 +1,23 @@
 // frontend/app/components/auth/LoginForm.tsx
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react'; // Explicitly import React
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { post } from '../../services/api';
-import { useToast } from '../../contexts/ToastContext'; // Import useToast
+import { useToast } from '../../contexts/ToastContext';
+// ADD MATERIAL UI IMPORTS
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  CircularProgress,
+  Stack, // For vertical spacing
+} from '@mui/material';
 
 export default function LoginForm() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false); // New state variable
   const { login, token } = useAuth();
@@ -21,7 +30,7 @@ export default function LoginForm() {
     setIsLoading(true); // Set loading to true on submission
 
     try {
-      const data = await post('/auth/login', { username, password }, token);
+      const data = await post('/auth/login', { email, password }, token);
       if (data.token) {
         login(data.token);
         showToast('Login successful!', 'success'); // Show success toast
@@ -37,51 +46,62 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto my-10">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Login to Tune & Dine</h2>
-      <div className="mb-4">
-        <label htmlFor="login-username" className="block text-sm font-medium text-gray-700 mb-1">
-          Username
-        </label>
-        <input
-          type="text"
-          id="login-username"
-          name="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      method="post"
+      sx={{
+        p: 4,
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 3,
+        maxWidth: 400,
+        mx: 'auto', // Center the form horizontally
+        my: 5, // Margin top/bottom
+      }}
+    >
+      <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+        Login
+      </Typography>
+      <Stack spacing={3} mt={3}> {/* For vertical spacing */}
+        <TextField
+          label="Email"
+          id="login-email"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+          fullWidth
+          variant="outlined"
+          autoComplete="email"
         />
-      </div>
-      <div className="mb-6">
-        <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">
-          Password
-        </label>
-        <input
+        <TextField
+          label="Password"
           type="password"
           id="login-password"
           name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          fullWidth
+          variant="outlined"
           autoComplete="current-password"
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
-      </div>
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            <span>LOGGING IN...</span>
-          </>
-        ) : (
-          <span>Login</span>
-        )}
-      </button>
-    </form>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={isLoading}
+          sx={{ height: 56 }} // Consistent height with TextFields
+        >
+          {isLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Sign In'
+          )}
+        </Button>
+      </Stack>
+    </Box>
   );
 }

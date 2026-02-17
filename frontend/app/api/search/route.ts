@@ -11,15 +11,27 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:500
  */
 export async function GET(request: Request) {
     try {
-        // 1. Get the query parameters from the incoming frontend request (e.g., ?location=Austin&venue_name=...)
+        // 1. Get the query parameters from the incoming frontend request
         const { searchParams } = new URL(request.url);
+        const isTrending = searchParams.get('trending') === 'true';
+        const isPairings = searchParams.get('pairings') === 'true';
+        const eventId = searchParams.get('eventId');
+        const tag = searchParams.get('tag');
         
-        // 2. Construct the full URL to the Express backend's search endpoint
-        // This includes passing all search parameters directly to the Express server.
-        const expressSearchUrl = `${BACKEND_URL}/api/venues/search?${searchParams.toString()}`;
+        // 2. Construct the full URL to the Express backend
+        let expressUrl;
+        if (isTrending) {
+            expressUrl = `${BACKEND_URL}/api/events/trending`;
+        } else if (isPairings && eventId) {
+            expressUrl = `${BACKEND_URL}/api/events/pairings/${eventId}`;
+        } else {
+            // Include tag in the query string for normal searches
+            const backendParams = new URLSearchParams(searchParams.toString());
+            expressUrl = `${BACKEND_URL}/api/venues/search?${backendParams.toString()}`;
+        }
 
         // 3. Make the fetch request to the Express backend
-        const response = await fetch(expressSearchUrl, {
+        const response = await fetch(expressUrl, {
             // Revalidate on every request to get fresh data
             cache: 'no-store', 
         });

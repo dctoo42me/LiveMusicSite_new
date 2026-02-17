@@ -5,16 +5,30 @@ import { useState } from 'react';
 import { post } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext'; // Import useToast
+import { useRouter } from 'next/navigation'; // Import useRouter
+// ADD MATERIAL UI IMPORTS
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  CircularProgress,
+  Stack, // For vertical spacing
+  Checkbox,
+  FormControlLabel
+} from '@mui/material';
 
 export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
   // const [error, setError] = useState(''); // No longer needed with toasts
   // const [success, setSuccess] = useState(''); // No longer needed with toasts
   const [isLoading, setIsLoading] = useState(false); // New state variable
   const { token } = useAuth();
   const { showToast } = useToast(); // Initialize useToast
+  const router = useRouter(); // Initialize useRouter
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +37,7 @@ export default function RegisterForm() {
     setIsLoading(true); // Set loading to true on submission
 
     try {
-      const data = await post('/auth/register', { username, email, password }, token);
+      const data = await post('/auth/register', { username, email, password, marketingOptIn }, token);
       if (data.error) {
         showToast(data.error, 'error');
       } else {
@@ -32,6 +46,7 @@ export default function RegisterForm() {
         setUsername('');
         setEmail('');
         setPassword('');
+        router.push('/login'); // Redirect to login page
       }
     } catch (err) {
       showToast('An unexpected error occurred.', 'error');
@@ -41,67 +56,88 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 bg-white rounded-lg shadow-xl max-w-md mx-auto my-10">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Register for Tune & Dine</h2>
-      <div className="mb-4">
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-          Username
-        </label>
-        <input
-          type="text"
-          id="username"
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      method="post"
+      sx={{
+        p: 4,
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 3,
+        maxWidth: 400,
+        mx: 'auto', // Center the form horizontally
+        my: 5, // Margin top/bottom
+      }}
+    >
+      <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+        Register
+      </Typography>
+      <Stack spacing={3} mt={3}> {/* For vertical spacing */}
+        <TextField
+          label="Username"
+          id="register-username"
           name="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
+          fullWidth
+          variant="outlined"
           autoComplete="username"
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          Email
-        </label>
-        <input
+        <TextField
+          label="Email"
           type="email"
-          id="email"
+          id="register-email"
           name="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          fullWidth
+          variant="outlined"
           autoComplete="email"
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
-      </div>
-      <div className="mb-6">
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-          Password
-        </label>
-        <input
+        <TextField
+          label="Password"
           type="password"
-          id="password"
+          id="register-password"
           name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          fullWidth
+          variant="outlined"
           autoComplete="new-password"
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         />
-      </div>
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            <span>REGISTERING...</span>
-          </>
-        ) : (
-          <span>Register</span>
-        )}
-      </button>
-    </form>
+        <FormControlLabel
+          control={
+            <Checkbox 
+              checked={marketingOptIn} 
+              onChange={(e) => setMarketingOptIn(e.target.checked)} 
+              color="primary" 
+            />
+          }
+          label={
+            <Typography variant="body2" color="text.secondary">
+              I want to receive weekly highlights, new venue alerts, and platform updates.
+            </Typography>
+          }
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={isLoading}
+          sx={{ height: 56 }} // Consistent height with TextFields
+        >
+          {isLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Create Account'
+          )}
+        </Button>
+      </Stack>
+    </Box>
   );
 }

@@ -37,8 +37,8 @@ describe.sequential('Auth Endpoints', () => {
       return newUser;
     });
 
-    vi.spyOn(authRepository, 'findUserByUsername').mockImplementation(async (pool, username) => {
-      return inMemoryUsers.find(u => u.username === username) || null;
+    vi.spyOn(authRepository, 'findUserByEmail').mockImplementation(async (pool, email) => {
+      return inMemoryUsers.find(u => u.email === email) || null;
     });
   });
 
@@ -48,16 +48,16 @@ describe.sequential('Auth Endpoints', () => {
   });
 
   describe('POST /api/auth/register', () => {
-    it('should not register a user with a duplicate username', async () => {
+    it('should not register a user with a duplicate email', async () => {
       const res = await request(app)
         .post('/api/auth/register')
         .send({
-          username: testUser.username, // Using the pre-created username
-          email: 'duplicate@example.com',
+          username: 'differentuser',
+          email: testUser.email, // Using the pre-created email
           password: 'password123',
         });
       expect(res.statusCode).toEqual(409);
-      expect(res.body.error).toEqual('Username already exists.');
+      expect(res.body.error).toEqual('Email already exists.');
     });
 
     it('should register a new user successfully', async () => {
@@ -78,7 +78,7 @@ describe.sequential('Auth Endpoints', () => {
       const res = await request(app)
         .post('/api/auth/login')
         .send({
-          username: testUser.username,
+          email: testUser.email,
           password: testUser.password,
         });
       expect(res.statusCode).toEqual(200);
@@ -89,11 +89,11 @@ describe.sequential('Auth Endpoints', () => {
       const res = await request(app)
         .post('/api/auth/login')
         .send({
-          username: testUser.username,
+          email: testUser.email,
           password: 'wrongpassword',
         });
       expect(res.statusCode).toEqual(401);
-      expect(res.body.error).toEqual('Invalid username or password.');
+      expect(res.body.error).toEqual('Invalid email or password.');
     });
   });
 
@@ -105,7 +105,7 @@ describe.sequential('Auth Endpoints', () => {
       const res = await request(app)
         .post('/api/auth/login')
         .send({
-          username: testUser.username,
+          email: testUser.email,
           password: testUser.password,
         });
       token = res.body.token;

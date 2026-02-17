@@ -12,20 +12,19 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[name="password"]', randomPassword);
     await page.click('button[type="submit"]');
     
-    // After registration, the user should remain on the registration page and see a success toast
-    await expect(page).toHaveURL('/register'); // Expect to stay on the register page
-    // Assuming toast is displayed correctly, but not asserting its visibility due to WebKit rendering issues.
-
-    // Now navigate to login page explicitly
-    await page.goto('/login');
+    // After registration, the user should be redirected to the login page
+    await expect(page).toHaveURL('/login'); 
 
     // Login
-    await page.fill('input[name="username"]', randomUsername);
+    await page.fill('input[name="email"]', `${randomUsername}@example.com`);
     await page.fill('input[name="password"]', randomPassword);
     await page.click('button[type="submit"]');
     
-    // After login, the user should be redirected to the homepage
-    await expect(page).toHaveURL('/'); // Assert redirection to homepage
+    // Wait for success toast
+    await expect(page.getByText('Login successful!')).toBeVisible();
+    
+    // After login, wait for the URL to be the homepage
+    await page.waitForURL('/', { timeout: 10000 }); // Explicitly wait for the homepage URL
     await page.waitForLoadState('networkidle'); // Wait for network to be idle, ensuring all data is loaded
     await expect(page.getByPlaceholder('City, State, or Zip Code')).toBeVisible(); // Assert a main content element is visible
     

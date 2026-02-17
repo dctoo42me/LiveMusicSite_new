@@ -1,39 +1,52 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-
-interface ToastMessage {
-  id: string;
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import Alert, { AlertColor } from '@mui/material/Alert';
 
 interface ToastContextType {
-  showToast: (message: string, type: ToastMessage['type']) => void;
+  showToast: (message: string, severity: AlertColor) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [severity, setSeverity] = useState<AlertColor>('info');
 
-  const showToast = useCallback((message: string, type: ToastMessage['type']) => {
-    const id = Date.now().toString();
-    setToasts((prevToasts) => [...prevToasts, { id, message, type }]);
+  const showToast = useCallback((message: string, severity: AlertColor) => {
+    setMessage(message);
+    setSeverity(severity);
+    setOpen(true);
   }, []);
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-  }, []);
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[1000] space-y-2">
-        {toasts.map((toast) => (
-          <Toast key={toast.id} {...toast} onRemove={() => removeToast(toast.id)} />
-        ))}
-      </div>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000} // Set duration to 3 seconds
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }} // Top-left position
+      >
+        <Alert
+          onClose={handleClose}
+          severity={severity}
+          variant="filled" // Use filled variant for more prominence
+          elevation={6} // Add elevation for a "pop" effect
+          sx={{ width: '100%' }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
     </ToastContext.Provider>
   );
 };
@@ -46,33 +59,3 @@ export const useToast = () => {
   return context;
 };
 
-interface ToastProps extends ToastMessage {
-  onRemove: () => void;
-}
-
-const Toast = ({ id, message, type, onRemove }: ToastProps) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onRemove();
-    }, 5000); // Toast disappears after 5 seconds
-    return () => clearTimeout(timer);
-  }, [id, onRemove]);
-
-  const bgColor = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500',
-  }[type];
-
-  return (
-    <div
-      className={`${bgColor} text-white px-4 py-2 rounded-md shadow-lg flex items-center justify-between space-x-4`}
-      role="alert"
-    >
-      <span>{message}</span>
-      <button onClick={onRemove} className="text-white font-bold text-lg leading-none">
-        &times;
-      </button>
-    </div>
-  );
-};

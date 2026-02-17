@@ -70,8 +70,8 @@ describe('Favorite Venues Endpoints', () => {
       return newUser;
     });
 
-    vi.spyOn(authRepository, 'findUserByUsername').mockImplementation(async (pool, username) => {
-      return inMemoryUsers.find(u => u.username === username) || null;
+    vi.spyOn(authRepository, 'findUserByEmail').mockImplementation(async (pool, email) => {
+      return inMemoryUsers.find(u => u.email === email) || null;
     });
 
     // Spy on favoriteRepository methods

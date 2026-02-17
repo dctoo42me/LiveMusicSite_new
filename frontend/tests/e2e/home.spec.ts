@@ -7,6 +7,6 @@ test('homepage has a header', async ({ page }) => {
   await expect(page.locator('header')).toBeVisible();
   
   // Use a more specific locator to avoid strict mode violations
-  const heading = page.getByRole('link', { name: 'Tune & Dine' });
+  const heading = page.getByRole('link', { name: 'Forks & Feedback' });
   await expect(heading).toBeVisible();
 });
