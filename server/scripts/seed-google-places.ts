@@ -3,8 +3,14 @@ import 'dotenv/config';
 import pg from 'pg';
 const { Pool } = pg;
 
-const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyAtp_i9VDwu4WP5E9X3zYZfsd-FwlzCX9I';
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://live_music_user:MyDev123!@localhost:5432/live_music_db';
+// SECURITY FIX: Use environment variables, NEVER hardcode keys in scripts pushed to public repos.
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!GOOGLE_API_KEY) {
+  console.error('Error: GOOGLE_MAPS_API_KEY is not defined in environment variables.');
+  process.exit(1);
+}
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 
@@ -32,8 +38,6 @@ async function seedFromGoogle(city: string) {
       const name = place.name;
       const address = place.formatted_address || '';
       
-      // Extract city/state/zip from formatted_address if possible
-      // Google usually gives: "123 Main St, Austin, TX 78701, USA"
       const addrParts = address.split(',').map((p: string) => p.trim());
       const cityPart = addrParts[addrParts.length - 3] || city;
       const stateZipPart = addrParts[addrParts.length - 2] || '';
@@ -43,11 +47,10 @@ async function seedFromGoogle(city: string) {
       const lng = place.geometry.location.lng;
       const rating = place.rating;
       
-      // 3. Insert into DB
-      // We use ON CONFLICT to avoid duplicates if we run this multiple times
+      // 3. Insert into DB (Aligned with Structural Cleanup Schema)
       await pool.query(`
-        INSERT INTO venues (name, city, state, zipcode, lat, lng, description, type)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO venues (name, city, state, zipcode, lat, lng, description, food_service_type, bar_service_type)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         ON CONFLICT (name, city, state) DO NOTHING
       `, [
         name,
@@ -57,7 +60,8 @@ async function seedFromGoogle(city: string) {
         lat,
         lng,
         `Vibrant venue found via discovery. Rated ${rating} stars on Google.`,
-        'both' // Default to both for our platform pairing mission
+        'bar_bites', // Default for discovered venues
+        'full_bar'   // Default for discovered venues
       ]);
 
       console.log(`  - Processed: ${name}`);
