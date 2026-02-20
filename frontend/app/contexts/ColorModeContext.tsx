@@ -11,19 +11,22 @@ interface ColorModeContextType {
 
 const ColorModeContext = createContext<ColorModeContextType>({
   toggleColorMode: () => {},
-  mode: 'dark',
+  mode: 'light',
 });
 
 export const useColorMode = () => useContext(ColorModeContext);
 
 export function ColorModeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<'light' | 'dark'>('dark');
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
 
   // Load saved preference
   useEffect(() => {
     const savedMode = localStorage.getItem('colorMode') as 'light' | 'dark';
     if (savedMode) {
       setMode(savedMode);
+    } else {
+      // Default to light if no preference is set
+      setMode('light');
     }
   }, []);
 

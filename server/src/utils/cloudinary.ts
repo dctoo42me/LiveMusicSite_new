@@ -3,13 +3,21 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import dotenv from 'dotenv';
+import logger from './logger.js';
 
 dotenv.config();
 
+const isConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
+                    process.env.CLOUDINARY_CLOUD_NAME !== 'dev_cloud';
+
+if (!isConfigured) {
+  logger.warn('Cloudinary is not configured. Media uploads will fail.');
+}
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
-  api_key: process.env.CLOUDINARY_API_KEY as string,
-  api_secret: process.env.CLOUDINARY_API_SECRET as string,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dev_cloud',
+  api_key: process.env.CLOUDINARY_API_KEY || 'dev_key',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'dev_secret',
 });
 
 // Configure storage for Venue Images

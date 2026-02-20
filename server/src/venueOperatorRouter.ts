@@ -34,15 +34,39 @@ export function createVenueOperatorRouter(pool: Pool) {
     }
   });
 
-  // POST /:venueId/events (Add event to a venue)
-  router.post('/:venueId/events', async (req: Request, res: Response) => {
+  // GET /:venueId/events/all (Fetch all events for a venue, including drafts)
+  router.get('/:venueId/events/all', async (req: Request, res: Response) => {
     const { venueId } = req.params;
-    const { date, type, description, tags } = req.body;
     const userId = (req as any).user.userId;
     const userRole = (req as any).user.role;
 
-    if (!date || !type || !description) {
-      return res.status(400).json({ error: 'Date, type, and description are required.' });
+    try {
+      const venueIdInt = parseInt(venueId as string, 10);
+      const venue = await getVenueById(pool, venueIdInt);
+
+      if (!venue) return res.status(404).json({ error: 'Venue not found.' });
+      if (venue.ownerId !== userId && userRole !== 'admin') return res.status(403).json({ error: 'Access denied.' });
+
+      const events = await getEventsByVenueId(pool, venueIdInt);
+      res.json(events);
+    } catch (error) {
+      logger.error('Get all venue events error:', error);
+      res.status(500).json({ error: 'Failed to retrieve events.' });
+    }
+  });
+
+  // POST /:venueId/events (Add event to a venue)
+  router.post('/:venueId/events', async (req: Request, res: Response) => {
+    const { venueId } = req.params;
+    const { date, description, tags, status } = req.body;
+    const userId = (req as any).user.userId;
+    const userRole = (req as any).user.role;
+
+    const eventStatus = status || 'published';
+
+    // Strict validation for published events
+    if (eventStatus === 'published' && (!date || !description || !tags || tags.length === 0)) {
+      return res.status(400).json({ error: 'Date, description, and at least one performance tag are required to publish.' });
     }
 
     try {
@@ -58,20 +82,20 @@ export function createVenueOperatorRouter(pool: Pool) {
         return res.status(403).json({ error: 'You do not have permission to manage this venue.' });
       }
 
-      // Enforce Tier Limits
-      if (venue.subscriptionTier === 'free' && userRole !== 'admin') {
+      // Enforce Tier Limits (Only for published events)
+      if (eventStatus === 'published' && venue.subscriptionTier === 'free' && userRole !== 'admin') {
         const eventCount = await getMonthlyEventCount(pool, venueIdInt);
         if (eventCount >= 4) {
           return res.status(403).json({ 
-            error: 'Monthly event limit reached for Free tier (4 events). Upgrade to Pro for unlimited events!',
+            error: 'Monthly event limit reached for Free tier (4 published events). Upgrade to Pro for unlimited events!',
             limitReached: true,
             tier: 'free'
           });
         }
       }
 
-      const newEvent = await createEvent(pool, venueIdInt, date, type, description, tags || []);
-      await logAction(pool, userId, 'CREATE_EVENT', 'events', newEvent.id, { venueId: venueIdInt });
+      const newEvent = await createEvent(pool, venueIdInt, date, description, tags || [], eventStatus);
+      await logAction(pool, userId, 'CREATE_EVENT', 'events', newEvent.id, { venueId: venueIdInt, status: eventStatus });
       
       res.status(201).json(newEvent);
     } catch (error) {

@@ -2,11 +2,25 @@
 import { Resend } from 'resend';
 import logger from './logger.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+const isDevMode = !apiKey || apiKey === 're_dev_placeholder';
+
+const resend = new Resend(apiKey || 're_dev_placeholder');
 
 const FROM_EMAIL = 'Forks & Feedback <onboarding@resend.dev>'; // Resend testing default
 const BRAND_COLOR = '#9c27b0'; // Primary Purple
 const SECONDARY_COLOR = '#ff9800'; // Secondary Orange
+
+/**
+ * Helper to check if email should be skipped
+ */
+function shouldSkipEmail(): boolean {
+  if (isDevMode) {
+    logger.warn('Email service is in Dev Mode (no API key). Skipping actual email send.');
+    return true;
+  }
+  return false;
+}
 
 /**
  * Wraps content in a professional HTML email layout
@@ -52,6 +66,7 @@ function getEmailLayout(title: string, body: string): string {
 }
 
 export async function sendWelcomeEmail(to: string, username: string) {
+  if (shouldSkipEmail()) return;
   const title = 'Welcome to the Community!';
   const body = `
     <p>Hi ${username},</p>
@@ -74,6 +89,7 @@ export async function sendWelcomeEmail(to: string, username: string) {
 }
 
 export async function sendClaimApprovalEmail(to: string, venueName: string) {
+  if (shouldSkipEmail()) return;
   const title = 'Your Venue Claim is Approved!';
   const body = `
     <p>Great news!</p>
@@ -101,6 +117,7 @@ export async function sendClaimApprovalEmail(to: string, venueName: string) {
 }
 
 export async function sendSubscriptionUpgradeEmail(to: string, venueName: string) {
+  if (shouldSkipEmail()) return;
   const title = 'Welcome to Forks & Feedback PRO!';
   const body = `
     <p>Congratulations!</p>
@@ -130,6 +147,7 @@ export async function sendSubscriptionUpgradeEmail(to: string, venueName: string
 }
 
 export async function sendSupportConfirmationEmail(to: string, ticketId: number) {
+  if (shouldSkipEmail()) return;
   const title = 'We Received Your Request';
   const body = `
     <p>Hello,</p>

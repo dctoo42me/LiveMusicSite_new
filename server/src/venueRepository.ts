@@ -21,6 +21,8 @@ export interface VenueEvent {
     website: string | null;
     imageUrl: string | null;
     verificationStatus: 'UNVERIFIED' | 'COMMUNITY_VERIFIED' | 'OWNER_VERIFIED' | 'FLAGGED';
+    food_service_type: 'none' | 'bar_bites' | 'full_menu';
+    bar_service_type: 'none' | 'non_alcoholic' | 'alcoholic_only' | 'full_bar';
 }
 
 // Interface for Static Venue Details
@@ -40,15 +42,17 @@ export interface VenueDetails {
     negativeConfirmations: number;
     subscriptionTier: 'free' | 'pro' | 'enterprise';
     stripeCustomerId: string | null;
+    food_service_type: 'none' | 'bar_bites' | 'full_menu';
+    bar_service_type: 'none' | 'non_alcoholic' | 'alcoholic_only' | 'full_bar';
 }
 
 // Interface for Event Details
 export interface EventDetails {
     id: number;
     date: string;
-    type: 'music' | 'meals' | 'both';
     description: string | null;
     tags: string[] | null;
+    status: 'draft' | 'published' | 'cancelled';
 }
 
 // Update the return type to include the total count
@@ -215,6 +219,9 @@ export async function searchVenues(
             paramIndex++;
         }
 
+        // Only show published events
+        whereClauses.push(`e.status = 'published'`);
+
         // Search by Name/Keyword -> Applies to VENUES table (v)
         if (name) {
             const sanitizedName = sanitize(name);
@@ -285,6 +292,8 @@ export async function searchVenues(
                     v."imageUrl",
                     v.verification_status as "verificationStatus",
                     v.subscription_tier as "subscriptionTier",
+                    v.food_service_type as "foodServiceType",
+                    v.bar_service_type as "barServiceType",
                     ${distanceCalc} as distance
                 FROM events e
                 JOIN venues v ON e.venue_id = v.id
@@ -337,7 +346,9 @@ export async function getVenueById(pool: Pool, id: number): Promise<VenueDetails
             positive_confirmations as "positiveConfirmations",
             negative_confirmations as "negativeConfirmations",
             subscription_tier as "subscriptionTier",
-            stripe_customer_id as "stripeCustomerId"
+            stripe_customer_id as "stripeCustomerId",
+            food_service_type as "foodServiceType",
+            bar_service_type as "barServiceType"
         FROM venues
         WHERE id = $1
     `, [id]);
@@ -353,7 +364,9 @@ export async function getVenuesByOwnerId(pool: Pool, ownerId: number): Promise<V
             positive_confirmations as "positiveConfirmations",
             negative_confirmations as "negativeConfirmations",
             subscription_tier as "subscriptionTier",
-            stripe_customer_id as "stripeCustomerId"
+            stripe_customer_id as "stripeCustomerId",
+            food_service_type as "foodServiceType",
+            bar_service_type as "barServiceType"
         FROM venues
         WHERE owner_id = $1
         ORDER BY name ASC
@@ -363,7 +376,7 @@ export async function getVenuesByOwnerId(pool: Pool, ownerId: number): Promise<V
 
 export async function getEventsByVenueId(pool: Pool, venueId: number): Promise<EventDetails[]> {
     const res = await pool.query(`
-        SELECT id, date, type, description, tags
+        SELECT id, date, description, tags, status
         FROM events
         WHERE venue_id = $1
         ORDER BY date ASC
@@ -427,12 +440,12 @@ export async function getMonthlyEventCount(pool: Pool, venueId: number): Promise
     return parseInt(res.rows[0].count, 10);
 }
 
-export async function createEvent(pool: Pool, venueId: number, date: string, type: string, description: string, tags: string[]) {
+export async function createEvent(pool: Pool, venueId: number, date: string, description: string, tags: string[], status: 'draft' | 'published' = 'published') {
     const res = await pool.query(`
-        INSERT INTO events (venue_id, date, type, description, tags)
+        INSERT INTO events (venue_id, date, description, tags, status)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *
-    `, [venueId, date, type, description, tags]);
+    `, [venueId, date, description, tags, status]);
     return res.rows[0];
 }
 
@@ -469,17 +482,19 @@ export async function getTrendingEvents(pool: Pool): Promise<VenueEvent[]> {
             v."imageUrl",
             v.verification_status as "verificationStatus",
             COUNT(se.id) as "saveCount",
+            v.food_service_type as "foodServiceType",
+            v.bar_service_type as "barServiceType",
             CASE WHEN e.date BETWEEN (SELECT fri FROM weekend_bounds) AND (SELECT sun FROM weekend_bounds) THEN 0 ELSE 1 END as is_weekend_priority
         FROM events e
         JOIN venues v ON e.venue_id = v.id
         LEFT JOIN saved_events se ON e.id = se.event_id
-        WHERE e.date >= CURRENT_DATE
+        WHERE e.date >= CURRENT_DATE AND e.status = 'published'
         GROUP BY e.id, v.id
         ORDER BY is_weekend_priority ASC, "saveCount" DESC, e.date ASC
         LIMIT 10
     `;
     const res = await pool.query(query);
-    return res.rows;
+    return res.rows as VenueEvent[];
 }
 
 export async function getPerfectPairings(pool: Pool, eventId: number): Promise<VenueEvent[]> {
@@ -511,7 +526,9 @@ export async function getPerfectPairings(pool: Pool, eventId: number): Promise<V
             e.tags,
             v.website, 
             v."imageUrl",
-            v.verification_status as "verificationStatus"
+            v.verification_status as "verificationStatus",
+            v.food_service_type as "foodServiceType",
+            v.bar_service_type as "barServiceType"
         FROM events e
         JOIN venues v ON e.venue_id = v.id
         WHERE v.city = $1 
@@ -522,7 +539,7 @@ export async function getPerfectPairings(pool: Pool, eventId: number): Promise<V
     `;
     
     const res = await pool.query(query, [city, date, targetType, eventId]);
-    return res.rows;
+    return res.rows as VenueEvent[];
 }
 
 export async function updateVenueMainImage(pool: Pool, venueId: number, imageUrl: string) {

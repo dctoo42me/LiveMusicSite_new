@@ -202,7 +202,9 @@ app.get('/api/venues/:id/events', async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const events = await getEventsByVenueId(pool, parseInt(id as string, 10));
-        res.json(events);
+        // Filter out drafts for public view
+        const publishedEvents = events.filter(e => e.status === 'published');
+        res.json(publishedEvents);
     } catch (error) {
         logger.error('Error fetching events by venue ID:', error);
         res.status(500).json({ error: 'Failed to fetch events' });

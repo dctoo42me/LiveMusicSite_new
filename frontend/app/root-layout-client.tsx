@@ -10,6 +10,7 @@ import { ColorModeProvider } from './contexts/ColorModeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import TopBar from './components/TopBar';
+import BackToTop from './components/BackToTop';
 import Link from 'next/link';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -32,6 +33,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       }}>
         {children}
       </Box>
+      <BackToTop />
       
       {/* Platform Footer */}
       <Box component="footer" sx={{ 

@@ -1,7 +1,7 @@
 // frontend/app/client-home-page.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SearchForm from './components/SearchForm';
 import SearchResults from './components/SearchResults';
 import VenueMap from './components/VenueMap';
@@ -27,12 +27,15 @@ export default function ClientHomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+  const mapSectionRef = useRef<HTMLDivElement>(null);
+  const searchFormRef = useRef<HTMLDivElement>(null); // Ref for the search form
 
   const [venues, setVenues] = useState<Venue[]>([]);
   const [trendingEvents, setTrendingEvents] = useState<Venue[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
+  const [shouldScrollToMap, setShouldScrollToMap] = useState(false);
 
   // Derived values from searchParams
   const location = searchParams.get('location') || '';
@@ -46,11 +49,27 @@ export default function ClientHomePage() {
   const lat = searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : undefined;
   const lng = searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : undefined;
 
+  // Effect to scroll to map when venues change
+  useEffect(() => {
+    if (shouldScrollToMap && venues.length > 0 && mapSectionRef.current) {
+      // Calculate offset: Header (64px) + TopBar (32px)
+      const yOffset = -(64 + 32); 
+      
+      const y = mapSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      // Only scroll if the map is below the current viewport or the search form is not visible
+      if (y > window.pageYOffset + window.innerHeight / 2 || (searchFormRef.current && searchFormRef.current.getBoundingClientRect().top < 0)) {
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        setShouldScrollToMap(false); // Reset the flag after scrolling
+      }
+    }
+  }, [venues, shouldScrollToMap]); // Add shouldScrollToMap to dependencies
+
   // Fetch trending events on mount
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch('/api/events/trending'); // Use dedicated endpoint
+        const response = await fetch('/api/events/trending');
         if (response.ok) {
           const data = await response.json();
           setTrendingEvents(data || []);
@@ -67,17 +86,18 @@ export default function ClientHomePage() {
       sessionStorage.setItem('lastSearchParams', JSON.stringify({ location, name, startDate, endDate, type, tag, limit, offset, lat, lng }));
     }
 
-    // Allow search if we have location text OR GPS coordinates OR Name
     if (!location && !lat && !lng && !name) {
       setVenues([]);
       setTotalCount(0);
       setLoading(false);
+      setShouldScrollToMap(false); // Do not scroll if no search criteria
       return;
     }
 
     setLoading(true);
     setError(null);
     setVenues([]);
+    setShouldScrollToMap(true); // Indicate that we should scroll to map after new data
 
     const params = new URLSearchParams();
     if (location) params.set('location', location);
@@ -91,7 +111,7 @@ export default function ClientHomePage() {
     params.set('limit', limit.toString());
     params.set('offset', offset.toString());
 
-    const apiUrl = `/api/search?${params.toString()}`;
+    const apiUrl = `/api/venues/search?${params.toString()}`;
 
     try {
       const response = await fetch(apiUrl);
@@ -100,6 +120,7 @@ export default function ClientHomePage() {
         throw new Error(`HTTP error ${response.status}: ${errorData.error || 'Check server logs.'}`);
       }
       const data = await response.json();
+      console.log('ClientHomePage: Received venues data:', data.venues); // Added log
       setVenues(data.venues);
       setTotalCount(data.totalCount);
     } catch (err) {
@@ -125,16 +146,21 @@ export default function ClientHomePage() {
     if (newLat) params.set('lat', newLat.toString()); else params.delete('lat');
     if (newLng) params.set('lng', newLng.toString()); else params.delete('lng');
     params.set('offset', '0');
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
+    // Explicitly scroll to the search form after the navigation, with a small delay
+    setTimeout(() => {
+      if (searchFormRef.current) {
+        searchFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Use 'center' to be more forgiving
+      }
+    }, 100);
   };
 
   const handlePageChange = (newOffset: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('offset', newOffset.toString());
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  // Logic to determine the heading for the trending section
   const hasWeekendEvents = trendingEvents.some(event => {
     const eventDate = new Date(event.date);
     const today = new Date();
@@ -174,8 +200,8 @@ export default function ClientHomePage() {
             color="text.secondary" 
             sx={{ 
               textAlign: { xs: 'center', md: 'left' },
-              maxWidth: '600px', // Limit width to force earlier wrapping
-              mx: { xs: 'auto', md: 0 } // Center on mobile, left-align on desktop
+              maxWidth: '600px',
+              mx: { xs: 'auto', md: 0 }
             }}
           >
             Discover local venues offering delicious meals paired with live events near you.
@@ -239,7 +265,7 @@ export default function ClientHomePage() {
                       )}
                       {event.verificationStatus === 'OWNER_VERIFIED' && (
                           <Tooltip title="Verified Venue">
-                              <VerifiedIcon color="success" sx={{ fontSize: '1rem' }} />
+                              <VerifiedIcon color="success" sx={{ fontSize: '1.rem' }} />
                           </Tooltip>
                       )}
                       {event.verificationStatus === 'COMMUNITY_VERIFIED' && (
@@ -269,7 +295,7 @@ export default function ClientHomePage() {
         )}
 
         {/* Search Form */}
-        <Box sx={{ my: 4 }}>
+        <Box sx={{ my: 4 }} ref={searchFormRef}>
           <SearchForm
             initialLocation={location}
             initialStartDate={startDate}
@@ -282,7 +308,7 @@ export default function ClientHomePage() {
 
         {/* Interactive Map */}
         {venues.length > 0 && (
-          <Box sx={{ my: 4 }}>
+          <Box sx={{ mb: 4, mt: 0 }} ref={mapSectionRef}>
             <VenueMap venues={venues} />
           </Box>
         )}

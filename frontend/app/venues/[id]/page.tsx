@@ -55,6 +55,7 @@ import Image from 'next/image';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import BusinessIcon from '@mui/icons-material/Business';
 import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
+import ServiceIcons from '@/app/components/ServiceIcons';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
@@ -203,6 +204,23 @@ export default function VenueDetailsPage() {
         }
       } finally {
         setLoading(false);
+        // Only scroll to top if there is no hash in the URL (like #events)
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+        } else {
+          // If there is a hash, give the browser a tiny moment to render then jump to it with an offset
+          setTimeout(() => {
+            const hashId = window.location.hash.replace('#', '');
+            const element = document.getElementById(hashId);
+            const stickyHeader = document.getElementById('venue-sticky-bar');
+            if (element) {
+              const headerHeight = stickyHeader ? stickyHeader.offsetHeight : 160;
+              const yOffset = -(headerHeight + 70); // Header height + global top bar + small buffer
+              const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+          }, 100);
+        }
       }
     };
 
@@ -431,7 +449,9 @@ export default function VenueDetailsPage() {
       </Card>
 
       {/* Dynamic Sticky Venue Title Bar */}
-      <Box sx={{ 
+      <Box 
+        id="venue-sticky-bar"
+        sx={{ 
         position: 'sticky', 
         top: 64, // Exactly under the sticky Header (64px)
         zIndex: 1100, 
@@ -445,29 +465,60 @@ export default function VenueDetailsPage() {
         boxShadow: scrolled ? 10 : 4,
         transition: 'all 0.3s ease-in-out',
         width: 'auto',
+        display: 'flex', // Added flex
+        justifyContent: 'space-between', // Push content apart
+        alignItems: 'center', // Center vertically
       }}>
-        <Typography 
-          variant={scrolled ? "h5" : "h3"} 
-          component="h1" 
-          fontWeight="bold" 
-          color={scrolled ? "#ffffff" : "primary.main"}
-          sx={{ transition: 'font-size 0.2s ease-in-out' }}
-        >
-          {venue.name}
-        </Typography>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          mt: scrolled ? 0 : 0.5,
-          opacity: scrolled ? 0.9 : 1,
-          transition: 'all 0.2s ease-in-out',
-          color: scrolled ? "#ffffff" : "inherit"
-        }}>
-          <LocationOnIcon sx={{ fontSize: scrolled ? '0.9rem' : '1.2rem', mr: 0.5, color: scrolled ? "#ffffff" : "secondary.main" }} />
-          <Typography variant={scrolled ? "caption" : "subtitle1"} sx={{ color: scrolled ? "#ffffff" : "text.secondary" }} fontWeight="medium">
-            {venue.city}, {venue.state} {venue.zipcode && ` ${venue.zipcode}`}
+        <Box> {/* Wrap title and address */}
+          <Typography 
+            variant={scrolled ? "h5" : "h3"} 
+            component="h1" 
+            fontWeight="bold" 
+            color={scrolled ? "#ffffff" : "primary.main"}
+            sx={{ transition: 'font-size 0.2s ease-in-out' }}
+          >
+            {venue.name}
           </Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mt: scrolled ? 0 : 0.5,
+            opacity: scrolled ? 0.9 : 1,
+            transition: 'all 0.2s ease-in-out',
+            color: scrolled ? "#ffffff" : "inherit"
+          }}>
+            <LocationOnIcon sx={{ fontSize: scrolled ? '0.9rem' : '1.2rem', mr: 0.5, color: scrolled ? "#ffffff" : "secondary.main" }} />
+            <Typography variant={scrolled ? "caption" : "subtitle1"} sx={{ color: scrolled ? "#ffffff" : "text.secondary" }} fontWeight="medium">
+              {venue.city}, {venue.state} {venue.zipcode && ` ${venue.zipcode}`}
+            </Typography>
+          </Box>
         </Box>
+
+        {/* New Quick-Jump Button */}
+        <Button
+          variant={scrolled ? "contained" : "outlined"}
+          color="secondary"
+          size={scrolled ? "small" : "medium"}
+          startIcon={<CalendarMonthIcon />}
+          onClick={() => {
+            const element = document.getElementById('events');
+            const stickyHeader = document.getElementById('venue-sticky-bar');
+            if (element) {
+              const headerHeight = stickyHeader ? stickyHeader.offsetHeight : 80;
+              const yOffset = -(headerHeight + 70); 
+              const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+          }}
+          sx={{ 
+            borderRadius: 2,
+            whiteSpace: 'nowrap',
+            ml: 2,
+            boxShadow: scrolled ? 2 : 0
+          }}
+        >
+          {scrolled ? 'Events' : 'View Events'}
+        </Button>
       </Box>
 
       <Grid container spacing={4}>
@@ -477,7 +528,9 @@ export default function VenueDetailsPage() {
               <Typography variant="h5" fontWeight="bold">
                 About the Venue
               </Typography>
+              {/* Service Icons and Share/Claim actions */}
               <Stack direction="row" spacing={1} alignItems="center">
+                <ServiceIcons foodServiceType={venue.foodServiceType} barServiceType={venue.barServiceType} size="medium" />
                 <Tooltip title="Share this venue">
                   <IconButton size="small" onClick={handleShare} color="primary">
                     <ShareIcon fontSize="small" />
@@ -508,8 +561,7 @@ export default function VenueDetailsPage() {
             </Box>
             <Typography variant="body1" paragraph color="text.secondary" sx={{ lineHeight: 1.8 }}>
               {venue.description || 'No description available for this venue.'}
-            </Typography>
-            
+            </Typography>            
             {venue.website && (
               <Tooltip title="Visit venue website">
                 <Button 
@@ -656,7 +708,7 @@ export default function VenueDetailsPage() {
             </Box>
           )}
 
-          <Box sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1, mb: 4 }}>
+          <Box id="events" sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1, mb: 4 }}>
             <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <CalendarMonthIcon sx={{ mr: 1, color: 'primary.main' }} />
               Upcoming Events
@@ -715,8 +767,10 @@ export default function VenueDetailsPage() {
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <Box>
                             <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: 'wrap', gap: 1 }}>
-                              {event.tags && event.tags.length > 0 ? (
-                                event.tags.map((tag) => (
+                              {event.tags && event.tags.length > 0 && (
+                                event.tags
+                                  .filter(tag => !['meals', 'dining', 'bar_bites', 'full_menu', 'none', 'alcoholic_only', 'non_alcoholic', 'full_bar'].includes(tag.toLowerCase())) // Safeguard filter
+                                  .map((tag) => (
                                   <Chip 
                                     key={tag}
                                     label={tag} 
@@ -725,14 +779,6 @@ export default function VenueDetailsPage() {
                                     sx={{ height: 20, fontSize: '0.7rem', fontWeight: 'bold' }}
                                   />
                                 ))
-                              ) : (
-                                <Chip 
-                                  label={event.type === 'both' ? 'Live Performance' : event.type} 
-                                  size="small" 
-                                  color="secondary" 
-                                  variant="outlined" 
-                                  sx={{ height: 20, fontSize: '0.7rem' }}
-                                />
                               )}
                             </Stack>
                             <Typography variant="body1" sx={{ fontWeight: 'medium', color: 'text.primary' }}>
@@ -861,7 +907,6 @@ export default function VenueDetailsPage() {
             To manage this venue and its performances, please provide your business details or a brief explanation of your relationship to the venue.
           </DialogContentText>
           <TextField
-            autoFocus
             margin="dense"
             label="Verification Details"
             fullWidth

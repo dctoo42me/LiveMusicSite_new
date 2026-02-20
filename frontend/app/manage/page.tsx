@@ -66,7 +66,7 @@ import OnboardingTour from '@/app/components/OnboardingTour';
 
 const PERFORMANCE_TAGS = [
   'Live Music', 'Jazz', 'Rock', 'Piano', 'Solo', 'Acoustic', 'Karaoke', 
-  'Stand-up', 'Blues', 'Country', 'DJ', 'Open Mic', 'Trivia', 'Magician', 'Classical', 'Symphony', 'Quartet', 'R&B', 'Latin'
+  'Stand-up', 'Blues', 'Country', 'DJ', 'Open Mic', 'Trivia', 'Magician', 'Classical', 'Symphony', 'Quartet', 'R&B', 'Latin', 'Other'
 ];
 
 interface GalleryImage {
@@ -113,7 +113,9 @@ export default function OperatorDashboard() {
   const [eventDate, setEventDate] = useState('');
   const [eventDescription, setEventDescription] = useState('');
   const [eventTags, setEventTags] = useState<string[]>([]);
+  const [customTag, setCustomTag] = useState(''); // State for 'Other' tag input
   const [submitting, setSubmitting] = useState(false);
+  const [draftEventsCount, setDraftEventsCount] = useState(0); // Track incomplete builds
 
   // Media Dialog State
   const [isMediaDialogOpen, setIsMediaDialogOpen] = useState(false);
@@ -139,17 +141,31 @@ export default function OperatorDashboard() {
         const venueData = await getManagedVenues(token!);
         setVenues(venueData);
 
-        // Fetch metrics for each venue
+        // Fetch metrics and check for drafts for each venue
         const metricsMap: Record<number, VenueMetrics> = {};
+        let totalDrafts = 0;
+
         await Promise.all(venueData.map(async (v: VenueDetails) => {
           try {
+            // Fetch metrics
             const m = await getVenueMetrics(token!, v.id);
             metricsMap[v.id] = m;
+
+            // Fetch events to count drafts (using operator-only endpoint)
+            const eventsRes = await fetch(`/api/manage/${v.id}/events/all`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (eventsRes.ok) {
+              const eventsData = await eventsRes.json();
+              const drafts = eventsData.filter((e: any) => e.status === 'draft').length;
+              totalDrafts += drafts;
+            }
           } catch (err) {
-            console.error(`Failed to fetch metrics for venue ${v.id}`, err);
+            console.error(`Failed to fetch extra data for venue ${v.id}`, err);
           }
         }));
         setMetrics(metricsMap);
+        setDraftEventsCount(totalDrafts);
       } catch (err) {
         console.error('Failed to fetch managed venues:', err);
         showToast('Failed to load your venues.', 'error');
@@ -172,6 +188,7 @@ export default function OperatorDashboard() {
     setEventDate('');
     setEventDescription('');
     setEventTags([]);
+    setCustomTag('');
   };
 
   const handleOpenMediaDialog = async (venue: VenueDetails) => {
@@ -259,24 +276,37 @@ export default function OperatorDashboard() {
     }
   };
 
-  const handleCreateEvent = async () => {
-    if (!selectedVenueId || !eventDate || !eventDescription) {
-      showToast('Please fill in all required fields.', 'warning');
+  const handleCreateEvent = async (status: 'draft' | 'published') => {
+    if (status === 'published' && (!selectedVenueId || !eventDate || !eventDescription || (eventTags.length === 0 && !customTag))) {
+      showToast('All fields and at least one performance tag are required to publish.', 'warning');
       return;
     }
 
+    if (status === 'draft' && !selectedVenueId) return;
+
     setSubmitting(true);
     try {
-      await createVenueEvent(token!, selectedVenueId, {
-        date: eventDate,
-        type: 'both', // Standard platform pairing
+      // Combine preset tags with custom tag if 'Other' is selected
+      let finalTags = eventTags.filter(t => t !== 'Other');
+      if (eventTags.includes('Other') && customTag.trim()) {
+        finalTags.push(customTag.trim());
+      }
+
+      await createVenueEvent(token!, selectedVenueId!, {
+        date: eventDate || new Date().toISOString().split('T')[0], // Default date for drafts
         description: eventDescription,
-        tags: eventTags
+        tags: finalTags,
+        status: status
       });
-      showToast('Performance added successfully!', 'success');
+      
+      showToast(status === 'published' ? 'Performance published successfully!' : 'Draft saved successfully!', 'success');
       handleCloseDialog();
+      
+      // Refresh data to show draft alerts if any
+      const updatedVenues = await getManagedVenues(token!);
+      setVenues(updatedVenues);
     } catch (err) {
-      showToast('Failed to add performance.', 'error');
+      showToast(`Failed to ${status === 'published' ? 'publish' : 'save draft'}.`, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -296,6 +326,25 @@ export default function OperatorDashboard() {
         <DashboardIcon color="primary" sx={{ fontSize: 40 }} />
         <Typography variant="h4" fontWeight="bold">Operator Dashboard</Typography>
       </Box>
+
+      {draftEventsCount > 0 && (
+        <Alert 
+          severity="warning" 
+          sx={{ mb: 4, borderRadius: 2, border: '1px solid orange' }}
+          action={
+            <Button color="inherit" size="small" onClick={() => showToast('Incomplete drafts are hidden from the public site.', 'info')}>
+              WHY?
+            </Button>
+          }
+        >
+          <Typography variant="subtitle2" fontWeight="bold">
+            You have {draftEventsCount} incomplete event build{draftEventsCount > 1 ? 's' : ''}.
+          </Typography>
+          <Typography variant="body2">
+            Finish and publish them to make them visible on your public venue page.
+          </Typography>
+        </Alert>
+      )}
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -415,7 +464,10 @@ export default function OperatorDashboard() {
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold' }}>Add New Performance</DialogTitle>
         <DialogContent>
-          <Stack spacing={3} sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, mt: 1 }}>
+            Fill out the details of your performance. You can save as a draft and finish later, or publish immediately.
+          </Typography>
+          <Stack spacing={3}>
             <TextField
               label="Performance Date"
               type="date"
@@ -424,6 +476,8 @@ export default function OperatorDashboard() {
               value={eventDate}
               onChange={(e) => setEventDate(e.target.value)}
               required
+              error={!eventDate}
+              helperText={!eventDate ? "Date is required" : ""}
             />
             <TextField
               label="Event Description"
@@ -434,8 +488,10 @@ export default function OperatorDashboard() {
               value={eventDescription}
               onChange={(e) => setEventDescription(e.target.value)}
               required
+              error={!eventDescription}
+              helperText={!eventDescription ? "Description is required" : "Tell users what to expect."}
             />
-            <FormControl fullWidth>
+            <FormControl fullWidth required error={eventTags.length === 0}>
               <InputLabel>Performance Tags</InputLabel>
               <Select
                 multiple
@@ -445,7 +501,7 @@ export default function OperatorDashboard() {
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => (
-                      <Chip key={value} label={value} size="small" />
+                      <Chip key={value} label={value} size="small" color="secondary" />
                     ))}
                   </Box>
                 )}
@@ -454,18 +510,45 @@ export default function OperatorDashboard() {
                   <MenuItem key={tag} value={tag}>{tag}</MenuItem>
                 ))}
               </Select>
+              <Typography variant="caption" sx={{ ml: 1.5, mt: 0.5, color: eventTags.length === 0 ? 'error.main' : 'text.secondary' }}>
+                At least one tag is required to publish.
+              </Typography>
             </FormControl>
+
+            {eventTags.includes('Other') && (
+              <TextField
+                label="Custom Performance Type"
+                placeholder="e.g. Fire Breather, Magic Show"
+                fullWidth
+                value={customTag}
+                onChange={(e) => setCustomTag(e.target.value)}
+                required
+                error={!customTag.trim()}
+                helperText="Specify the type of entertainment."
+              />
+            )}
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
           <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
-          <Button 
-            onClick={handleCreateEvent} 
-            variant="contained" 
-            disabled={submitting}
-          >
-            {submitting ? <CircularProgress size={24} /> : 'Create Event'}
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button 
+              onClick={() => handleCreateEvent('draft')} 
+              variant="outlined" 
+              color="primary"
+              disabled={submitting}
+            >
+              Save Draft
+            </Button>
+            <Button 
+              onClick={() => handleCreateEvent('published')} 
+              variant="contained" 
+              color="success"
+              disabled={submitting || !eventDate || !eventDescription || (eventTags.length === 0 && !customTag)}
+            >
+              {submitting ? <CircularProgress size={24} /> : 'Publish Event'}
+            </Button>
+          </Stack>
         </DialogActions>
       </Dialog>
 

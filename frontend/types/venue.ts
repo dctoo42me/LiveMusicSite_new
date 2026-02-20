@@ -10,11 +10,12 @@ export interface Venue {
   state: string;
   zipcode: string | null;
   date: string; 
-  type: 'music' | 'meals' | 'both';
   description: string | null;
   tags: string[] | null;
   website: string | null;
   imageUrl: string | null;
   verificationStatus: 'UNVERIFIED' | 'COMMUNITY_VERIFIED' | 'OWNER_VERIFIED' | 'FLAGGED';
   subscriptionTier: 'free' | 'pro' | 'enterprise';
+  foodServiceType: 'none' | 'bar_bites' | 'full_menu';
+  barServiceType: 'none' | 'non_alcoholic' | 'alcoholic_only' | 'full_bar';
 }

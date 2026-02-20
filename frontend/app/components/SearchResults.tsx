@@ -28,7 +28,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import InfoIcon from '@mui/icons-material/Info';
 import LaunchIcon from '@mui/icons-material/Launch';
 import MapIcon from '@mui/icons-material/Map';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import ServiceIcons from './ServiceIcons'; // Import ServiceIcons component
 import GPPGoodIcon from '@mui/icons-material/GppGood';
 import StarIcon from '@mui/icons-material/Star';
 import ShareIcon from '@mui/icons-material/Share';
@@ -47,6 +49,7 @@ interface SearchResultsProps {
 }
 
 export default function SearchResults({ venues, loading, error, totalCount, limit, offset, onPageChange }: SearchResultsProps) {
+  console.log('SearchResults: Received venues prop:', venues); // Added log
   const { token, logout } = useAuth();
   const { showToast } = useToast();
   const [favoritedVenueIds, setFavoritedVenueIds] = useState<Set<number>>(new Set());
@@ -204,12 +207,12 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                                {venue.tags && venue.tags.length > 0 ? (
-                                    venue.tags.map((tag) => (
+                                {venue.tags && venue.tags.length > 0 && (
+                                    venue.tags
+                                      .filter(tag => !['meals', 'dining', 'bar_bites', 'full_menu', 'none', 'alcoholic_only', 'non_alcoholic', 'full_bar'].includes(tag.toLowerCase())) // Safeguard filter
+                                      .map((tag) => (
                                         <Chip key={tag} label={tag} size="small" color="secondary" sx={{ fontWeight: 'bold' }} />
                                     ))
-                                ) : (
-                                    <Chip label="Live Performance" size="small" color="secondary" variant="outlined" />
                                 )}
                             </Stack>
                             <Box sx={{ display: 'flex', gap: 0.5, mt: -0.5 }}>
@@ -235,6 +238,11 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                             <Typography variant="h6" component="h2" sx={{ wordBreak: 'break-word', flexGrow: 1 }}>
                                 {venue.name}
                             </Typography>
+                            <ServiceIcons 
+                              foodServiceType={venue.foodServiceType} 
+                              barServiceType={venue.barServiceType} 
+                              size="small" 
+                            />
                             {venue.subscriptionTier === 'pro' && (
                                 <Tooltip title="Featured Venue">
                                     <Chip 
@@ -281,6 +289,19 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                             </Button>
                         </Tooltip>
                         <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Tooltip title="Jump to upcoming events" sx={{ flex: 1 }}>
+                                <Button 
+                                    fullWidth
+                                    size="small" 
+                                    variant="outlined" 
+                                    startIcon={<CalendarMonthIcon />}
+                                    component={Link} 
+                                    href={`/venues/${venue.venueId}#events`}
+                                    sx={{ textTransform: 'none' }}
+                                >
+                                    Events
+                                </Button>
+                            </Tooltip>
                             <Tooltip title="Open in Google Maps" sx={{ flex: 1 }}>
                                 <Button 
                                     fullWidth
@@ -296,24 +317,24 @@ export default function SearchResults({ venues, loading, error, totalCount, limi
                                     Map
                                 </Button>
                             </Tooltip>
-                            {venue.website && (
-                                <Tooltip title="Visit venue website" sx={{ flex: 1 }}>
-                                    <Button 
-                                        fullWidth
-                                        size="small" 
-                                        variant="outlined" 
-                                        startIcon={<LaunchIcon />}
-                                        component={Link} 
-                                        href={venue.website} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        sx={{ textTransform: 'none' }}
-                                    >
-                                        Site
-                                    </Button>
-                                </Tooltip>
-                            )}
                         </Box>
+                        {venue.website && (
+                            <Tooltip title="Visit venue website">
+                                <Button 
+                                    fullWidth
+                                    size="small" 
+                                    variant="outlined" 
+                                    startIcon={<LaunchIcon />}
+                                    component={Link} 
+                                    href={venue.website} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    sx={{ textTransform: 'none' }}
+                                >
+                                    Site
+                                </Button>
+                            </Tooltip>
+                        )}
                     </Stack>
                 </CardActions>
             </Card>

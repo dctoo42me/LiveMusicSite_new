@@ -9,15 +9,30 @@ import { logAction } from './utils/audit.js';
 import { sendSubscriptionUpgradeEmail } from './utils/email.js';
 import logger from './utils/logger.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+const apiKey = process.env.STRIPE_SECRET_KEY;
+const isDevMode = !apiKey || apiKey === 'sk_test_dev_placeholder';
+
+const stripe = new Stripe(apiKey || 'sk_test_dev_placeholder', {
   apiVersion: '2025-01-27' as any,
 });
 
 export function createStripeRouter(pool: Pool) {
   const router = Router();
 
+  // Middleware to check for Stripe key
+  const checkStripeConfig = (req: Request, res: Response, next: any) => {
+    if (isDevMode) {
+      logger.warn(`Stripe operation attempted in Dev Mode: ${req.method} ${req.path}`);
+      return res.status(503).json({ 
+        error: 'Stripe is not configured in this environment.',
+        details: 'Missing STRIPE_SECRET_KEY in server/.env'
+      });
+    }
+    next();
+  };
+
   // POST /create-checkout-session
-  router.post('/create-checkout-session', verifyToken, async (req: Request, res: Response) => {
+  router.post('/create-checkout-session', verifyToken, checkStripeConfig, async (req: Request, res: Response) => {
     const { venueId } = req.body;
     const userId = (req as any).user.userId;
 
@@ -61,7 +76,7 @@ export function createStripeRouter(pool: Pool) {
   });
 
   // POST /create-portal-session (Manage existing subscription)
-  router.post('/create-portal-session', verifyToken, async (req: Request, res: Response) => {
+  router.post('/create-portal-session', verifyToken, checkStripeConfig, async (req: Request, res: Response) => {
     const { venueId } = req.body;
     const userId = (req as any).user.userId;
 
@@ -86,6 +101,9 @@ export function createStripeRouter(pool: Pool) {
   // POST /webhook (Secure Stripe Listener)
   // Note: This requires the raw body, handled in index.ts
   router.post('/webhook', async (req: Request, res: Response) => {
+    if (isDevMode) {
+      return res.status(200).json({ message: 'Webhook received but ignored in Dev Mode (no Stripe key).' });
+    }
     const sig = req.headers['stripe-signature'] as string;
     let event: Stripe.Event;
 
